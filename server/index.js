@@ -14,7 +14,7 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 
 // Reads cookies from browser
-app.use(cookieParser());
+// app.use(cookieParser());
 
 // middleware :- check the routes and show the error as statuscode
 app.use(morgan("dev"));

@@ -143,7 +143,7 @@ const SignUp = () => {
               </button>
 
               <div className="text-end ">
-                <div className="py-5 flex justify-center gap-1 ">
+                <div className="py-5 flex gap-1 ">
                   <span className="text-gray-400"> Aready have account?</span>
                   <div className="">
                     <button
