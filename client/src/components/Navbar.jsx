@@ -1,33 +1,69 @@
 import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [theme, setTheme] = useState("");
 
   const handleThemeChange = (event) => {
+    // value of selected option
     setTheme(event.target.value);
+    // saved at local storage as it remains forever
     localStorage.setItem("ChatKaroTheme", event.target.value);
+    // changes direclty at index.html at <HTML data-theme></HTML>
     document.documentElement.setAttribute("data-theme", event.target.value);
   };
 
+  const navigate = useNavigate();
+
+  // useEffect with [] refersh once at click
   useEffect(() => {
+    // get the theme value storedat local storage
     const currentTheme = localStorage.getItem("ChatKaroTheme");
     document.documentElement.setAttribute("data-theme", currentTheme);
     setTheme(currentTheme);
   }, []);
   return (
     <>
-      <div className="bg-primary flex justify-between py-2 px-4 items-center">
-        <h1>ChatKaro</h1>
+      <div className="sticky top-0 bg-primary flex justify-between py-2 px-4 items-center">
+        <Link to={"/"}>ChatKaro</Link>
 
         <div className="flex gap-4">
-          <span>Home</span>
-          <span>About</span>
-          <span>Contact Us</span>
+          <Link to={"/"} className="">
+            Home
+          </Link>
+          <Link to={"/about"} className="">
+            About
+          </Link>
+          <Link to={"/contact"} className="">
+            Contact
+          </Link>
         </div>
 
         <div className="flex gap-3">
-          <button className="btn btn-secondary">Login</button>
-          <button className="btn btn-secondary-accent">Register</button>
+          {/* Logim Button */}
+
+          <button
+            className="btn btn-secondary"
+            onClick={() => {
+              navigate("/login");
+            }}
+          >
+            Login
+          </button>
+
+          {/* SignUp Button */}
+
+          <button
+            className="btn btn-secondary-accent"
+            onClick={() => {
+              navigate("/signup");
+            }}
+          >
+            Sign Up
+          </button>
+
+          {/* Flyon UI theme selector */}
+          
           <select
             name="theme"
             id="theme"
