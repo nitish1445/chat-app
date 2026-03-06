@@ -4,10 +4,11 @@ import { toast } from "react-hot-toast";
 import api from "../config/Api";
 import { useGoogleAuth } from "../config/GoogleAuth";
 import { FcGoogle } from "react-icons/fc";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
-
+  const { setUser, setIsLogin } = useAuth();
   const { isLoading, error, isInitialized, signInWithGoogle } = useGoogleAuth();
 
   // handle Google Login Submit
@@ -16,8 +17,10 @@ const Login = () => {
     try {
       const res = await api.post("/auth/googleLogin", userData);
       toast.success(res.data.message);
-      navigate("/user-dashboard");
       sessionStorage.setItem("ChatKaroUser", JSON.stringify(res.data.data));
+      setIsLogin(true);
+      setUser(res.data.data);
+      navigate("/chatting");
       handleClear();
     } catch (error) {
       console.log(error);
@@ -65,8 +68,10 @@ const Login = () => {
     try {
       const res = await api.post("/auth/login", detail);
       toast.success(res.data.message);
-      navigate("/user-dashboard");
       sessionStorage.setItem("ChatKaroUser", JSON.stringify(res.data.data));
+      setIsLogin(true);
+      setUser(res.data.data);
+      navigate("/chatting");
       handleClear();
     } catch (error) {
       console.log(error);

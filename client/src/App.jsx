@@ -7,7 +7,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Navbar from "./components/Navbar";
-import UserDashboard from "./pages/dashboards/UserDashboard";
+import Chatting from "./pages/Chatting";
 
 const App = () => {
   return (
@@ -21,7 +21,7 @@ const App = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/user-dashbaord" element={<UserDashboard />} />
+          <Route path="/chatting" element={<Chatting />} />
         </Routes>
       </BrowserRouter>
     </>
