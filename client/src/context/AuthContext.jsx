@@ -4,7 +4,7 @@ const AuthContext = React.createContext();
 
 export const AuthProvider = (props) => {
   const [user, setUser] = useState(
-    JSON.parse(sessionStorage.getItem("ChatKaroUser")) || "",
+    JSON.parse(sessionStorage.getItem("ConvoUser")) || "",
   );
   const [isLogin, setIsLogin] = useState(!!user);
 
@@ -13,7 +13,7 @@ export const AuthProvider = (props) => {
   }, [user]);
 
   useEffect(() => {
-    const storedUser = sessionStorage.getItem("ChatKaroUser");
+    const storedUser = sessionStorage.getItem("ConvoUser");
 
     if (storedUser) {
       setUser(JSON.parse(storedUser));

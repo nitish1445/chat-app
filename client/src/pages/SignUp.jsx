@@ -2,15 +2,34 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import api from "../config/Api";
+import { MdOutlineMail } from "react-icons/md";
+import { LuUser } from "react-icons/lu";
+import { VscLock } from "react-icons/vsc";
+import { FiPhone } from "react-icons/fi";
+import {
+  AiOutlineEye,
+  AiOutlineEyeInvisible,
+  AiOutlineSafety,
+} from "react-icons/ai";
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
+  const [showPassword, setShowPassword] = useState(false);
+
   const [detail, setDetail] = useState({
     fullName: "",
     email: "",
     phone: "",
     password: "",
-    confirmPassword: "",
   });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setDetail((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleClear = () => {
     setDetail({
@@ -18,155 +37,150 @@ const SignUp = () => {
       email: "",
       phone: "",
       password: "",
-      confirmPassword: "",
     });
   };
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setDetail((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const navigate = useNavigate();
 
   const submitSignUp = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    try {
-      console.log(detail);
+    setLoading(true);
 
+    try {
       const res = await api.post("/auth/signup", detail);
+
       toast.success(res.data.message);
 
-      // sessionStorage.setItem("ChatKaroUser", JSON.stringify(res.data.data));
       handleClear();
+      navigate("/login");
     } catch (error) {
-      console.log(error);
-      toast.error(error?.response?.data?.message || "Unkown Error");
+      toast.error(error?.response?.data?.message || "Unknown Error");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <div className="min-h-screen bg-base-200 py-5 px-4">
-        <div className="max-w-120 mx-auto mt-12">
-          <div className="bg-base-100 rounded-xl shadow-2xl overflow-hidden">
-            <form
-              onSubmit={submitSignUp}
-              onReset={handleClear}
-              className="pt-5 px-5"
-            >
-              <h1 className="text-2xl font-bold text-base-content mb-5">
-                Register Now
-              </h1>
+      <div className="min-h-screen py-8 flex items-center justify-center bg-linear-to-b from-cyan-50 via-sky-50 to-slate-100 px-4 relative overflow-hidden">
+        {/* Glow background (same structure as first design) */}
+        <div className="absolute w-96 h-96 bg-cyan-300/30 rounded-full blur-[120px] -top-20 -left-20" />
+        <div className="absolute w-96 h-96 bg-sky-300/30 rounded-full blur-[120px] -bottom-20 -right-20" />
 
-              <div className="mb-5">
-                <div className="space-y-3">
-                  <div>
-                    <input
-                      type="text"
-                      name="fullName"
-                      placeholder="Enter your full name"
-                      value={detail.fullName}
-                      onChange={handleChange}
-                      disabled={isLoading}
-                      required
-                      className="w-full px-4 py-3 border-2 border-base-300 rounded-lg focus:outline-none focus:border-primary transition disabled:cursor-not-allowed disabled:bg-base-200"
-                    />
-                  </div>
+        <div className="w-full max-w-md relative z-10">
+          {/* Header */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="text-4xl p-5 rounded-full bg-white/90 border border-cyan-200 shadow-lg shadow-cyan-900/10 text-cyan-700">
+              <AiOutlineSafety />
+            </div>
 
-                  <div>
-                    <input
-                      type="text"
-                      name="email"
-                      placeholder="Enter you email"
-                      value={detail.email}
-                      onChange={handleChange}
-                      disabled={isLoading}
-                      required
-                      className="w-full px-4 py-3 border-2 border-base-300 rounded-lg focus:outline-none focus:border-primary transition disabled:cursor-not-allowed disabled:bg-base-200"
-                    />
-                  </div>
+            <h2 className="text-3xl font-bold mt-4 text-slate-900">
+              Create Account
+            </h2>
 
-                  <div>
-                    <input
-                      type="phone"
-                      name="phone"
-                      placeholder="Enter your phone number"
-                      value={detail.phone}
-                      onChange={handleChange}
-                      disabled={isLoading}
-                      required
-                      className="w-full px-4 py-3 border-2 border-base-300 rounded-lg focus:outline-none focus:border-primary transition disabled:cursor-not-allowed disabled:bg-base-200"
-                    />
-                  </div>
+            <p className="text-slate-600 text-sm">
+              Register to start chatting
+            </p>
+          </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <input
-                        type="password"
-                        name="password"
-                        value={detail.password}
-                        placeholder="Enter your Password"
-                        onChange={handleChange}
-                        disabled={isLoading}
-                        required
-                        className="w-full px-4 py-3 border-2 border-base-300 rounded-lg focus:outline-none focus:border-primary transition disabled:cursor-not-allowed disabled:bg-base-200"
-                      />
-                    </div>
+          {/* Card */}
+          <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl shadow-cyan-900/10 border border-slate-200 p-8">
+            <form onSubmit={submitSignUp} className="space-y-6">
+              {/* Name */}
+              <InputField
+                icon={<LuUser />}
+                name="fullName"
+                placeholder="Enter your full name"
+                value={detail.fullName}
+                onChange={handleChange}
+                disabled={loading}
+              />
 
-                    <div>
-                      <input
-                        type="confirmPassword"
-                        name="confirmPassword"
-                        value={detail.confirmPassword}
-                        placeholder="Confirm your Password"
-                        onChange={handleChange}
-                        disabled={isLoading}
-                        required
-                        className="w-full px-4 py-3 border-2 border-base-300 rounded-lg focus:outline-none focus:border-primary transition disabled:cursor-not-allowed disabled:bg-base-200"
-                      />
-                    </div>
-                  </div>
-                </div>
+              {/* Email */}
+              <InputField
+                icon={<MdOutlineMail />}
+                name="email"
+                type="email"
+                placeholder="Enter email address"
+                value={detail.email}
+                onChange={handleChange}
+                disabled={loading}
+              />
+
+              {/* Phone */}
+              <InputField
+                icon={<FiPhone />}
+                name="phone"
+                type="tel"
+                placeholder="Enter phone number"
+                value={detail.phone}
+                onChange={handleChange}
+                disabled={loading}
+              />
+
+              {/* Password */}
+              <div className="relative">
+                <VscLock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400  z-10 pointer-events-none" />
+
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Create password"
+                  value={detail.password}
+                  onChange={handleChange}
+                  disabled={loading}
+                  className="input w-full pl-10 pr-10 bg-white border-slate-200 text-slate-800 focus:outline-none focus:border-cyan-400"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+                >
+                  {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                </button>
               </div>
 
+              {/* Submit */}
               <button
                 type="submit"
-                disabled={isLoading}
-                className="flex-1 bg-secondary text-secondary-content font-bold py-3 px-6 rounded-lg shadow-lg w-full disabled:cursor-not-allowed"
+                disabled={loading}
+                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-cyan-900/20"
               >
-                {isLoading ? "Loading..!" : "Create Account"}
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
 
-              <div className="text-end ">
-                <div className="py-5 flex gap-1 ">
-                  <span className="text-gray-400"> Aready have account?</span>
-                  <div className="">
-                    <button
-                      type="button"
-                      onClick={() => navigate("/login")}
-                      disabled={isLoading}
-                      className="text-primary hover:underline"
-                    >
-                      Login here
-                    </button>
-                  </div>
-                </div>
+              {/* Login */}
+              <div className="text-center border-t pt-5">
+                <p className="text-slate-600 text-sm mb-2">
+                  Already have an account?
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/login")}
+                  className="text-cyan-700 hover:text-cyan-800 hover:underline"
+                >
+                  Login Instead
+                </button>
               </div>
             </form>
           </div>
-
-          <p className="text-center text-base-content/60 mt-5 text-sm">
-            All fields marked are mandatory. We respect your privacy.
-          </p>
         </div>
       </div>
     </>
   );
 };
+
+const InputField = ({ icon, ...props }) => (
+  <div className="relative">
+    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10 pointer-events-none">
+      {icon}
+    </span>
+
+    <input
+      {...props}
+      className="input w-full pl-10 bg-white border-slate-200 text-slate-800 focus:outline-none focus:border-cyan-400"
+    />
+  </div>
+);
 
 export default SignUp;

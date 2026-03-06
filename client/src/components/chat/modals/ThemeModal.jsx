@@ -1,79 +1,5 @@
-// import React, { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-
-// const ThemeModal = ({ onClose }) => {
-//   const [theme, setTheme] = useState("");
-//   const handleThemeChange = (event) => {
-//     setTheme(event.target.value);
-//     localStorage.setItem("ChatKaroTheme", event.target.value);
-//     document.documentElement.setAttribute("data-theme", event.target.value);
-//   };
-
-//   const navigate = useNavigate();
-
-//   // useEffect with [] refersh once at click
-//   useEffect(() => {
-//     // get the theme value storedat local storage
-//     const currentTheme = localStorage.getItem("ChatKaroTheme");
-//     document.documentElement.setAttribute("data-theme", currentTheme);
-//     setTheme(currentTheme);
-//   }, []);
-//   return (
-//     <>
-//       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-//         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-md p-8 shadow-2xl text-white relative">
-//           {/* Close Button */}
-//           <button
-//             onClick={onClose}
-//             className="absolute top-4 right-8 text-gray-400 hover:text-red-400 text-xl cursor-pointer"
-//           >
-//             {/* <RxCross2 /> */}X
-//           </button>
-
-//           {/* Header */}
-//           <h2 className="text-2xl font-bold mb-6 bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent text-center">
-//             Change Theme
-//           </h2>
-//         </div>
-//         <div>
-//           <select
-//             name="theme"
-//             id="theme"
-//             className="select"
-//             onChange={handleThemeChange}
-//             value={theme}
-//           >
-//             <option value="">Default</option>
-//             <option value="perplexity">Perplexity</option>
-//             <option value="light">Light</option>
-//             <option value="vscode">Dark</option>
-//             <option value="claude">Claude</option>
-//             <option value="spotify">Spotify</option>
-//             <option value="dark">Dark</option>
-//             <option value="black">Black</option>
-//             <option value="corporate">Corporate</option>
-//             <option value="ghibli">Ghibli</option>
-//             <option value="gourmet">Gourmet</option>
-//             <option value="luxury">Luxury</option>
-//             <option value="mintlify">Mintlify</option>
-//             <option value="pastel">Pastel</option>
-//             <option value="shadcn">Shadcn</option>
-//             <option value="slack">Slack</option>
-//             <option value="soft">Soft</option>
-//             <option value="valorant">Valorant</option>
-//           </select>
-//         </div>
-//       </div>
-
-//       {/* Flyon UI theme selector */}
-//     </>
-//   );
-// };
-
-// export default ThemeModal;
-
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../../context/ThemeContext";
 
 const themes = [
   "default",
@@ -97,26 +23,20 @@ const themes = [
 ];
 
 const ThemeModal = ({ onClose }) => {
-  const [savedTheme, setSavedTheme] = useState("");
-  const [tempTheme, setTempTheme] = useState("");
+  const { theme, changeTheme } = useTheme();
+  const [tempTheme, setTempTheme] = useState(theme);
 
   useEffect(() => {
-    const currentTheme = localStorage.getItem("ChatKaroTheme") || "";
-    setSavedTheme(currentTheme);
-    setTempTheme(currentTheme);
-  }, []);
+    setTempTheme(theme);
+  }, [theme]);
 
-  // OK button
   const applyTheme = () => {
-    localStorage.setItem("ChatKaroTheme", tempTheme);
-    document.documentElement.setAttribute("data-theme", tempTheme);
-    setSavedTheme(tempTheme);
+    changeTheme(tempTheme);
     onClose();
   };
 
-  // Cancel button
   const cancelTheme = () => {
-    setTempTheme(savedTheme);
+    setTempTheme(theme);
     onClose();
   };
   return (
@@ -146,7 +66,6 @@ const ThemeModal = ({ onClose }) => {
             </label>
           ))}
         </div>
-
 
         {/* Buttons */}
         <div className="flex justify-end gap-3 mt-3 px-6">

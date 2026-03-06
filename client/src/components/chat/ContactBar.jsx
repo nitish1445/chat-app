@@ -237,7 +237,7 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
     try {
       setUser(null);
       setIsLogin(false);
-      sessionStorage.removeItem("ChatKaroUser");
+      sessionStorage.removeItem("ConvoUser");
       navigate("/login");
       toast.success("Logout Successfull !");
     } catch (error) {
