@@ -34,13 +34,13 @@ const About = () => {
           <div className="grid items-center gap-8 lg:grid-cols-2">
             <div>
               <p className="mb-3 inline-flex rounded-full border border-cyan-300 bg-cyan-100/60 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-cyan-900">
-                ABOUT CONVO
+                ABOUT CONVERSE
               </p>
               <h1 className="text-4xl font-black leading-tight text-slate-900 md:text-6xl">
                 Built to keep conversations moving
               </h1>
               <p className="mt-4 max-w-xl text-slate-600 md:text-lg">
-                Convo is a modern chat app designed for fast communication,
+                Converse is a modern chat app designed for fast communication,
                 clean collaboration, and everyday reliability. It helps users
                 connect in real-time with an interface that stays smooth and
                 easy to use.
@@ -86,7 +86,7 @@ const About = () => {
               Fast communication should feel effortless
             </h2>
             <p className="mt-2 max-w-3xl text-slate-600">
-              Teams lose time when chat tools are cluttered or slow. Convo is
+              Teams lose time when chat tools are cluttered or slow. Converse is
               built to reduce friction: clean layouts, clear conversation paths,
               and dependable authentication so people can focus on work.
             </p>
@@ -110,7 +110,7 @@ const About = () => {
         </section>
 
         <footer className="border-t border-slate-200 bg-white/70 py-4 text-center text-sm text-slate-600">
-          © 2026 Convo. All rights reserved.
+          © 2026 Converse. All rights reserved.
         </footer>
       </main>
     </>

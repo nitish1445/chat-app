@@ -41,7 +41,7 @@ const Home = () => {
                 Ship together.
               </h1>
               <p className="mt-4 max-w-xl text-base text-slate-600 md:text-lg">
-                Convo keeps your team aligned with fast messaging, simple rooms,
+                Converse keeps your team aligned with fast messaging, simple rooms,
                 and a distraction-free interface made for daily collaboration.
               </p>
 
@@ -70,7 +70,7 @@ const Home = () => {
                 <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
                 <p className="ml-2 text-xs text-slate-500">
-                  convo.live/rooms/product
+                  converse.live/rooms/product
                 </p>
               </div>
 
@@ -116,7 +116,7 @@ const Home = () => {
         <section className="mx-auto max-w-6xl px-4 pb-16 md:px-8 md:pb-24">
           <div className="mb-7">
             <p className="mb-2 inline-flex rounded-full border border-cyan-300 bg-cyan-100/60 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-cyan-900">
-              WHY CONVO
+              WHY CONVERSE
             </p>
             <h2 className="text-2xl font-black text-slate-900 md:text-4xl">
               Built for focused conversations
@@ -141,7 +141,7 @@ const Home = () => {
         </section>
 
         <footer className="border-t border-slate-200 bg-white/70 py-4 text-center text-sm text-slate-600">
-          © 2026 Convo - Real-time Messaging. All rights reserved.
+          © 2026 Converse - Real-time Messaging. All rights reserved.
         </footer>
       </main>
     </>

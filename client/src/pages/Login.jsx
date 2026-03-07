@@ -43,7 +43,7 @@ const Login = () => {
       const res = await api.post("/auth/googleLogin", userData);
       toast.success(res.data.message);
 
-      sessionStorage.setItem("ConvoUser", JSON.stringify(res.data.data));
+      sessionStorage.setItem("ConverseUser", JSON.stringify(res.data.data));
       setIsLogin(true);
       setUser(res.data.data);
 
@@ -72,7 +72,7 @@ const Login = () => {
 
       toast.success(res.data.message);
 
-      sessionStorage.setItem("ConvoUser", JSON.stringify(res.data.data));
+      sessionStorage.setItem("ConverseUser", JSON.stringify(res.data.data));
 
       setIsLogin(true);
       setUser(res.data.data);

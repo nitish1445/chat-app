@@ -42,7 +42,7 @@ const Navbar = () => {
         <div className="sticky top-0 z-40 bg-linear-to-r from-cyan-600 to-sky-600 shadow-lg shadow-cyan-900/20 flex justify-between py-3 px-8 items-center text-white">
           {/* Logo */}
           <div className="text-xl font-bold">
-            <Link to="/">Convo</Link>
+            <Link to="/">Converse</Link>
           </div>
 
           {/* Desktop Links */}
@@ -93,7 +93,7 @@ const Navbar = () => {
       >
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-white/20">
-          <span className="text-xl font-semibold">Convo</span>
+          <span className="text-xl font-semibold">Converse</span>
 
           <HiOutlineX
             className="w-6 h-6 cursor-pointer"

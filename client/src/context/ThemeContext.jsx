@@ -6,14 +6,14 @@ export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState("default");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("ConvoTheme") || "default";
+    const savedTheme = localStorage.getItem("ConverseTheme") || "default";
     setTheme(savedTheme);
     document.documentElement.setAttribute("data-theme", savedTheme);
   }, []);
 
   const changeTheme = (newTheme) => {
     setTheme(newTheme);
-    localStorage.setItem("ConvoTheme", newTheme);
+    localStorage.setItem("ConverseTheme", newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
   };
 

@@ -1,5 +1,5 @@
 import "dotenv/config";
-
+import cookieParser from "cookie-parser";       
 import express from "express";
 import cors from "cors";
 import connectDB from "./src/config/db.js";
@@ -9,22 +9,17 @@ import morgan from "morgan";
 
 const app = express();
 
-// middleware :- check the req origin or Allow frontend to access Backend
-// Cross-Origin Resource Sharing
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 
-// Reads cookies from browser
-// app.use(cookieParser());
+app.use(cookieParser());
 
 // middleware :- check the routes and show the error as statuscode
 app.use(morgan("dev"));
 
-// route :- shpw the direction to req
 app.use("/auth", AuthRouter);
 app.use("/user", UserRouter);
 
-// Health checkup {optional but recommended}
 app.get("/", (req, res) => {
   res.status(200).json({ message: "API is running 🚀" });
 });
@@ -37,20 +32,15 @@ app.use((err, req, res, next) => {
   res.status(StatusCode).json({ message: ErrorMessage });
 });
 
-//
 const port = process.env.PORT || 5000;
 
-// Starts server only after DB is connected
 const startServer = async () => {
   try {
-    // connect the server
     await connectDB();
-    // starts server after checking db is connected
     app.listen(port, () => {
       console.log("Server started at port:", port);
     });
   } catch (error) {
-    // if db not connected
     console.log("DB connection failed:", error);
   }
 };

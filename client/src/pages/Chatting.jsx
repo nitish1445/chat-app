@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import QuickNavigation from "../components/chat/QuickNavigation";
 import ContactBar from "../components/chat/ContactBar";
-import ChatWindow from "../components/chat/chatWindow";
+import ChatWindow from "../components/chat/ChatWindow";
 import { useAuth } from "../context/AuthContext";
 
 const Chatting = () => {
@@ -30,7 +30,7 @@ const Chatting = () => {
             />
           </div>
           <div className="flex-1 overflow-hidden">
-            <ChatWindow receiver={receiver} setReceiver={setReceiver} />
+            <ChatWindow receiver={receiver} />
           </div>
         </div>
       ) : (

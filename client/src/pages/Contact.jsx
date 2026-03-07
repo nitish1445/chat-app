@@ -4,12 +4,12 @@ import { toast } from "react-hot-toast";
 const supportCards = [
   {
     title: "General Help",
-    value: "support@convo.app",
+    value: "support@converse.app",
     note: "Response in 12-24 hours",
   },
   {
     title: "Business Enquiry",
-    value: "business@convo.app",
+    value: "business@converse.app",
     note: "Partnerships and enterprise plans",
   },
   {
@@ -56,7 +56,7 @@ const Contact = () => {
         <section className="mx-auto max-w-6xl">
           <div className="mb-8 text-center md:text-left">
             <p className="mb-3 inline-flex rounded-full border border-cyan-300 bg-cyan-100/60 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-cyan-900">
-              CONTACT CONVO
+              CONTACT CONVERSE
             </p>
             <h1 className="text-3xl font-black text-slate-900 md:text-5xl">
               Let&apos;s talk about your chat experience
@@ -87,7 +87,7 @@ const Contact = () => {
               <article className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
                 <h2 className="text-lg font-bold text-slate-900">Office</h2>
                 <p className="mt-2 text-slate-700">
-                  Convo Labs, Sector 62, Noida, Uttar Pradesh, India
+                  Converse Labs, Sector 62, Noida, Uttar Pradesh, India
                 </p>
               </article>
             </div>
@@ -181,7 +181,7 @@ const Contact = () => {
       </main>
 
       <footer className="border-t border-slate-200 bg-white/70 py-4 text-center text-sm text-slate-600">
-        © 2026 Convo. All rights reserved.
+        © 2026 Converse. All rights reserved.
       </footer>
     </>
   );

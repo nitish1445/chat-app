@@ -4,119 +4,64 @@ import { HiDotsVertical } from "react-icons/hi";
 import { BiSolidSend } from "react-icons/bi";
 import { LuSticker } from "react-icons/lu";
 import { ImAttachment } from "react-icons/im";
+import { FaCircleNotch } from "react-icons/fa";
+import api from "../../config/Api";
+import { useAuth } from "../../context/AuthContext";
 
-const DummyChatData = [
-  {
-    senderId: 1,
-    receiverId: 2,
-    message: "Hi, how are you?",
-  },
-  {
-    senderId: 2,
-    receiverId: 1,
-    message: "I am good! How about you?",
-  },
-  {
-    senderId: 1,
-    receiverId: 2,
-    message: "Doing well. Are you free today?",
-  },
-  {
-    senderId: 2,
-    receiverId: 1,
-    message: "Yes, mostly in the evening.",
-  },
-  {
-    senderId: 1,
-    receiverId: 2,
-    message: "Great, we should catch up.",
-  },
-  {
-    senderId: 2,
-    receiverId: 1,
-    message: "Sure, what time works for you?",
-  },
-  {
-    senderId: 1,
-    receiverId: 2,
-    message: "Maybe around 6 PM?",
-  },
-  {
-    senderId: 2,
-    receiverId: 1,
-    message: "6 PM sounds good.",
-  },
-  {
-    senderId: 1,
-    receiverId: 2,
-    message: "Let's meet at the cafe near the office.",
-  },
-  {
-    senderId: 2,
-    receiverId: 1,
-    message: "Perfect, I like that place.",
-  },
-  {
-    senderId: 1,
-    receiverId: 2,
-    message: "Did you finish the project work?",
-  },
-  {
-    senderId: 2,
-    receiverId: 1,
-    message: "Almost done, just a few things left.",
-  },
-  {
-    senderId: 1,
-    receiverId: 2,
-    message: "Nice! Let me know if you need help.",
-  },
-  {
-    senderId: 2,
-    receiverId: 1,
-    message: "Thanks, I will.",
-  },
-  {
-    senderId: 1,
-    receiverId: 2,
-    message: "Also, did you check the new tech article I shared?",
-  },
-  {
-    senderId: 2,
-    receiverId: 1,
-    message: "Yes, it was really interesting.",
-  },
-  {
-    senderId: 1,
-    receiverId: 2,
-    message: "The part about real-time apps was great.",
-  },
-  {
-    senderId: 2,
-    receiverId: 1,
-    message: "True, especially the Socket.IO example.",
-  },
-  {
-    senderId: 1,
-    receiverId: 2,
-    message: "Exactly! I want to try building one.",
-  },
-  {
-    senderId: 2,
-    receiverId: 1,
-    message: "Let's discuss it in the evening then.",
-  },
-];
-
-const ChatWindow = ({ receiver  }) => {
+const ChatWindow = ({ receiver }) => {
+  const { user } = useAuth();
   const bottomRef = useRef(null);
+
+  const senderId = user?.id || 1; // Replace with actual logged-in user ID
+  const receiverId = receiver?._id || 2; // Replace with actual receiver ID
+
+  const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
 
   const scrolltoBottom = () => {
-    console.log(bottomRef);
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const handleSend = async () => {
+    const messagePacket = {
+      senderId,
+      receiverId,
+      message: inputMessage,
+    };
+
+    try {
+      const res = await api.post(`/user/sendMessage/${receiverId}`, {
+        inputMessage,
+      });
+      setInputMessage("");
+      setMessages((prev) => [...prev, res.data.data]);
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Message Sending Failed");
+    }
+  };
+
+  const fetchAllOldMessage = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get(`/user/fetchMessages/${receiverId}`);
+      setMessages(res.data.data);
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || "Error fetching messages");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //on component Load
+  useEffect(() => {
+    setMessages([]);
+    if (receiver) {
+      fetchAllOldMessage();
+    }
+  }, [receiver]);
 
   //On Every New Message
   useEffect(() => {
@@ -126,34 +71,6 @@ const ChatWindow = ({ receiver  }) => {
   const handleKeyDown = (e) => {
     e.key === "Enter" && handleSend();
   };
-
-  const handleSend = () => {
-    //call Backend
-
-    const messagePacket = {
-      senderId: 1,
-      receiverId: 2,
-      message: inputMessage,
-    };
-    setMessages((prev) => [...prev, messagePacket]);
-    setInputMessage("");
-  };
-
-  const fetchAllOldMessage = () => {
-    try {
-      setTimeout(() => {
-        setMessages(DummyChatData);
-      }, 5000);
-    } catch (error) {
-      toast.error("Some Error");
-    }
-  };
-
-  //on component Load
-  useEffect(() => {
-    setMessages([]);
-    fetchAllOldMessage();
-  }, [receiver]);
 
   // search for reciever
   if (!receiver) {
@@ -196,19 +113,33 @@ const ChatWindow = ({ receiver  }) => {
             messages.map((chat, idx) => (
               <div
                 key={idx}
-                className={`chat ${
-                  chat.senderId === 2 ? "chat-receiver" : "chat-sender"
-                }`}
+                className={`chat ${chat.senderId === receiverId ? "chat-receiver" : "chat-sender"}`}
               >
                 <div className="chat-header text-base-content">
-                  {chat.senderId === 2 ? receiver.fullName : "Nitish Kumar"}
+                  {chat.senderId === receiverId
+                    ? receiver.fullName
+                    : user.fullName}
                 </div>
                 <div className="chat-bubble">{chat.message}</div>
               </div>
             ))
-          ) : (
+          ) : loading ? (
             <div className="w-full h-full flex items-center justify-center">
-              Loading Chats ...
+              <div className="flex flex-col gap-3 items-center">
+                <div className="animate-spin">
+                  <FaCircleNotch />
+                </div>
+                <div>Loading messages...</div>
+              </div>
+            </div>
+          ) : (
+            <div className=" flex items-center justify-center">
+              <div className="flex flex-col items-center mt-50">
+                <h2 className="text-xl font-semibold mb-1">Converse </h2>
+                <p className="text-sm text-center max-w-md">
+                  Your messages will appear here.
+                </p>
+              </div>
             </div>
           )}
 
@@ -235,9 +166,10 @@ const ChatWindow = ({ receiver  }) => {
             />
 
             <button
-              className=" text-2xl text-primary"
+              className=" text-2xl text-primary disabled:text-secondary disabled:cursor-not-allowed"
               title="Send"
               onClick={handleSend}
+              disabled={inputMessage === ""}
             >
               <BiSolidSend />
             </button>
