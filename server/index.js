@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./src/config/db.js";
 import AuthRouter from "./src/routers/authRouter.js";
+import UserRouter from "./src/routers/userRouter.js";
 import morgan from "morgan";
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(morgan("dev"));
 
 // route :- shpw the direction to req
 app.use("/auth", AuthRouter);
+app.use("/user", UserRouter);
 
 // Health checkup {optional but recommended}
 app.get("/", (req, res) => {
@@ -35,7 +37,7 @@ app.use((err, req, res, next) => {
   res.status(StatusCode).json({ message: ErrorMessage });
 });
 
-// 
+//
 const port = process.env.PORT || 5000;
 
 // Starts server only after DB is connected

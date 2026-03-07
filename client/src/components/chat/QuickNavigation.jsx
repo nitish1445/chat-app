@@ -1,10 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { MdOutlineChat } from "react-icons/md";
 import { IoSettingsOutline, IoChatbubblesOutline } from "react-icons/io5";
 import { CiUser } from "react-icons/ci";
 import { useAuth } from "../../context/AuthContext";
 
 const QuickNavigation = ({ setFetchMode, setReceiver }) => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const navBtn =
     "rounded-full p-2 text-base-content/70 hover:text-base-content hover:bg-base-300 transition-colors duration-200";
@@ -43,14 +45,7 @@ const QuickNavigation = ({ setFetchMode, setReceiver }) => {
           <IoSettingsOutline />
         </button>
 
-        <button
-          title="Profile"
-          className={navBtn}
-          onClick={() => {
-            setFetchMode("profile");
-            setReceiver(null);
-          }}
-        >
+        <button title="Profile" className={navBtn} onClick={() => {navigate("/user-dashboard")}}>
           {user ? (
             <div className="bg-primary text-primary-content rounded-full w-6">
               <span className="flex items-center justify-center text-sm font-semibold w-6 h-6">

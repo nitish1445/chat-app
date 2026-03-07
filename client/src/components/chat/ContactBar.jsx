@@ -6,190 +6,191 @@ import { FaMoon } from "react-icons/fa";
 import { LuLogOut } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import ThemeModal from "./modals/ThemeModal";
+import api from "../../config/Api";
 
 const DummyRecentContact = [
   {
     id: 1,
-    name: "Amit Sharma",
+    fullName: "Amit Sharma",
     email: "amit.sharma@example.com",
-    contactNumber: "9876543210",
+    phoneNumber: "9876543210",
   },
   {
     id: 2,
-    name: "Priya Verma",
+    fullName: "Priya Verma",
     email: "priya.verma@example.com",
-    contactNumber: "9876501234",
+    phoneNumber: "9876501234",
   },
   {
     id: 3,
-    name: "Rahul Singh",
+    fullName: "Rahul Singh",
     email: "rahul.singh@example.com",
-    contactNumber: "9123456780",
+    phoneNumber: "9123456780",
   },
   {
     id: 4,
-    name: "Sneha Gupta",
+    fullName: "Sneha Gupta",
     email: "sneha.gupta@example.com",
-    contactNumber: "9988776655",
+    phoneNumber: "9988776655",
   },
   {
     id: 5,
-    name: "Vikram Patel",
+    fullName: "Vikram Patel",
     email: "vikram.patel@example.com",
-    contactNumber: "9898989898",
+    phoneNumber: "9898989898",
   },
   {
     id: 6,
-    name: "Neha Joshi",
+    fullName: "Neha Joshi",
     email: "neha.joshi@example.com",
-    contactNumber: "9812345678",
+    phoneNumber: "9812345678",
   },
   {
     id: 7,
-    name: "Arjun Mehta",
+    fullName: "Arjun Mehta",
     email: "arjun.mehta@example.com",
-    contactNumber: "9001122334",
+    phoneNumber: "9001122334",
   },
   {
     id: 8,
-    name: "Kavita Nair",
+    fullName: "Kavita Nair",
     email: "kavita.nair@example.com",
-    contactNumber: "9012345678",
+    phoneNumber: "9012345678",
   },
   {
     id: 9,
-    name: "Rohit Agarwal",
+    fullName: "Rohit Agarwal",
     email: "rohit.agarwal@example.com",
-    contactNumber: "9090909090",
+    phoneNumber: "9090909090",
   },
   {
     id: 10,
-    name: "Pooja Kapoor",
+    fullName: "Pooja Kapoor",
     email: "pooja.kapoor@example.com",
-    contactNumber: "9887766554",
+    phoneNumber: "9887766554",
   },
 ];
 
 const DummyAllContact = [
   {
     id: 11,
-    name: "Ankit Tiwari",
+    fullName: "Ankit Tiwari",
     email: "ankit.tiwari@example.com",
-    contactNumber: "9876012345",
+    phoneNumber: "9876012345",
   },
   {
     id: 12,
-    name: "Ritika Saxena",
+    fullName: "Ritika Saxena",
     email: "ritika.saxena@example.com",
-    contactNumber: "9811122233",
+    phoneNumber: "9811122233",
   },
   {
     id: 13,
-    name: "Manish Yadav",
+    fullName: "Manish Yadav",
     email: "manish.yadav@example.com",
-    contactNumber: "9822334455",
+    phoneNumber: "9822334455",
   },
   {
     id: 14,
-    name: "Deepak Choudhary",
+    fullName: "Deepak Choudhary",
     email: "deepak.choudhary@example.com",
-    contactNumber: "9833445566",
+    phoneNumber: "9833445566",
   },
   {
     id: 15,
-    name: "Shalini Mishra",
+    fullName: "Shalini Mishra",
     email: "shalini.mishra@example.com",
-    contactNumber: "9844556677",
+    phoneNumber: "9844556677",
   },
   {
     id: 16,
-    name: "Karan Malhotra",
+    fullName: "Karan Malhotra",
     email: "karan.malhotra@example.com",
-    contactNumber: "9855667788",
+    phoneNumber: "9855667788",
   },
   {
     id: 17,
-    name: "Nisha Arora",
+    fullName: "Nisha Arora",
     email: "nisha.arora@example.com",
-    contactNumber: "9866778899",
+    phoneNumber: "9866778899",
   },
   {
     id: 18,
-    name: "Sandeep Kulkarni",
+    fullName: "Sandeep Kulkarni",
     email: "sandeep.kulkarni@example.com",
-    contactNumber: "9877889900",
+    phoneNumber: "9877889900",
   },
   {
     id: 19,
-    name: "Pankaj Bansal",
+    fullName: "Pankaj Bansal",
     email: "pankaj.bansal@example.com",
-    contactNumber: "9888990011",
+    phoneNumber: "9888990011",
   },
   {
     id: 20,
-    name: "Aarti Deshmukh",
+    fullName: "Aarti Deshmukh",
     email: "aarti.deshmukh@example.com",
-    contactNumber: "9899001122",
+    phoneNumber: "9899001122",
   },
   {
     id: 21,
-    name: "Varun Khanna",
+    fullName: "Varun Khanna",
     email: "varun.khanna@example.com",
-    contactNumber: "9900112233",
+    phoneNumber: "9900112233",
   },
   {
     id: 22,
-    name: "Megha Sinha",
+    fullName: "Megha Sinha",
     email: "megha.sinha@example.com",
-    contactNumber: "9911223344",
+    phoneNumber: "9911223344",
   },
   {
     id: 23,
-    name: "Tarun Bhatt",
+    fullName: "Tarun Bhatt",
     email: "tarun.bhatt@example.com",
-    contactNumber: "9922334455",
+    phoneNumber: "9922334455",
   },
   {
     id: 24,
-    name: "Komal Jain",
+    fullName: "Komal Jain",
     email: "komal.jain@example.com",
-    contactNumber: "9933445566",
+    phoneNumber: "9933445566",
   },
   {
     id: 25,
-    name: "Rakesh Pawar",
+    fullName: "Rakesh Pawar",
     email: "rakesh.pawar@example.com",
-    contactNumber: "9944556677",
+    phoneNumber: "9944556677",
   },
   {
     id: 26,
-    name: "Divya Nanda",
+    fullName: "Divya Nanda",
     email: "divya.nanda@example.com",
-    contactNumber: "9955667788",
+    phoneNumber: "9955667788",
   },
   {
     id: 27,
-    name: "Saurabh Gupta",
+    fullName: "Saurabh Gupta",
     email: "saurabh.gupta@example.com",
-    contactNumber: "9966778899",
+    phoneNumber: "9966778899",
   },
   {
     id: 28,
-    name: "Isha Kapoor",
+    fullName: "Isha Kapoor",
     email: "isha.kapoor@example.com",
-    contactNumber: "9977889900",
+    phoneNumber: "9977889900",
   },
   {
     id: 29,
-    name: "Aditya Srivastava",
+    fullName: "Aditya Srivastava",
     email: "aditya.srivastava@example.com",
-    contactNumber: "9988990011",
+    phoneNumber: "9988990011",
   },
   {
     id: 30,
-    name: "Ritu Pandey",
+    fullName: "Ritu Pandey",
     email: "ritu.pandey@example.com",
-    contactNumber: "9999001122",
+    phoneNumber: "9999001122",
   },
 ];
 
@@ -207,24 +208,24 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
   const [themeModalOpen, setThemeModalOpen] = useState(false);
   const { user, setUser, isLogin, setIsLogin } = useAuth();
 
-  const fetchContacts = () => {
-    // Simulate an API call with a delay
+  const fetchContacts = async () => {
     setLoading(true);
     try {
-      setTimeout(() => {
-        setLoading(false);
-        if (fetchMode === "recentChat") {
-          setContacts(DummyRecentContact);
-        } else if (fetchMode === "allChat") {
-          setContacts(DummyAllContact);
-        } else {
-          setContacts([]);
-        }
-      }, 1000);
+      let res;
+      if (fetchMode === "recentChat") {
+        console.log("Calling recents");
+
+        setContacts(DummyRecentContact);
+      } else if (fetchMode === "allChat") {
+        console.log("Calling All");
+        res = await api.get("/user/allUsers");
+        setContacts(res.data.data);
+      }
     } catch (error) {
       toast.error("Failed to load contacts. Please try again.");
     } finally {
       //setLoading(true);
+      setLoading(false);
     }
   };
 
@@ -345,7 +346,7 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                   <div className="avatar">
                     <div className="bg-primary text-primary-content rounded-full w-10">
                       <span className="flex items-center justify-center text-sm font-semibold w-10 h-10">
-                        {contact.name?.charAt(0)}
+                        {contact.fullName?.charAt(0)}
                       </span>
                     </div>
                   </div>
@@ -353,7 +354,7 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                   {/* Contact Info */}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-base-content">
-                      {contact.name}
+                      {contact.fullName}
                     </h3>
 
                     <p className="text-sm text-base-content/70 truncate">

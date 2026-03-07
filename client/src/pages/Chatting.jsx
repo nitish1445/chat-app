@@ -6,7 +6,7 @@ import ChatWindow from "../components/chat/chatWindow";
 import { useAuth } from "../context/AuthContext";
 
 const Chatting = () => {
-  const [fetchMode, setFetchMode] = useState("recentChat");
+  const [fetchMode, setFetchMode] = useState("allChat");
   const [receiver, setReceiver] = useState(null);
   const { user, isLogin } = useAuth();
 
@@ -30,7 +30,7 @@ const Chatting = () => {
             />
           </div>
           <div className="flex-1 overflow-hidden">
-            <ChatWindow receiver={receiver} />
+            <ChatWindow receiver={receiver} setReceiver={setReceiver} />
           </div>
         </div>
       ) : (

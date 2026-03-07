@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { HiDotsVertical } from "react-icons/hi";
 import { BiSolidSend } from "react-icons/bi";
 import { LuSticker } from "react-icons/lu";
@@ -107,7 +108,54 @@ const DummyChatData = [
   },
 ];
 
-const ChatWindow = ({ receiver }) => {
+const ChatWindow = ({ receiver  }) => {
+  const bottomRef = useRef(null);
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState("");
+
+  const scrolltoBottom = () => {
+    console.log(bottomRef);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  //On Every New Message
+  useEffect(() => {
+    scrolltoBottom();
+  }, [messages]);
+
+  const handleKeyDown = (e) => {
+    e.key === "Enter" && handleSend();
+  };
+
+  const handleSend = () => {
+    //call Backend
+
+    const messagePacket = {
+      senderId: 1,
+      receiverId: 2,
+      message: inputMessage,
+    };
+    setMessages((prev) => [...prev, messagePacket]);
+    setInputMessage("");
+  };
+
+  const fetchAllOldMessage = () => {
+    try {
+      setTimeout(() => {
+        setMessages(DummyChatData);
+      }, 5000);
+    } catch (error) {
+      toast.error("Some Error");
+    }
+  };
+
+  //on component Load
+  useEffect(() => {
+    setMessages([]);
+    fetchAllOldMessage();
+  }, [receiver]);
+
+  // search for reciever
   if (!receiver) {
     return (
       <div className="p-2 h-full flex items-center justify-center">
@@ -128,12 +176,12 @@ const ChatWindow = ({ receiver }) => {
             <div className="avatar">
               <div className="bg-primary text-primary-content rounded-full w-10">
                 <span className="flex items-center justify-center text-sm font-semibold w-10 h-10">
-                  {receiver.name?.charAt(0)}
+                  {receiver.fullName?.charAt(0)}
                 </span>
               </div>
             </div>
             <h2 className="text-lg font-semibold text-base-content capitalize">
-              {receiver.name}
+              {receiver.fullName}
             </h2>
           </div>
 
@@ -144,19 +192,28 @@ const ChatWindow = ({ receiver }) => {
 
         {/* Chat Section */}
         <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-accent/30">
-          {DummyChatData.map((chat, idx) => (
-            <div
-              key={idx}
-              className={`chat ${
-                chat.senderId === 2 ? "chat-receiver" : "chat-sender"
-              }`}
-            >
-              <div className="chat-header text-base-content">
-                {chat.senderId === 2 ? receiver.name : "Nitish Kumar"}
+          {messages.length > 0 ? (
+            messages.map((chat, idx) => (
+              <div
+                key={idx}
+                className={`chat ${
+                  chat.senderId === 2 ? "chat-receiver" : "chat-sender"
+                }`}
+              >
+                <div className="chat-header text-base-content">
+                  {chat.senderId === 2 ? receiver.fullName : "Nitish Kumar"}
+                </div>
+                <div className="chat-bubble">{chat.message}</div>
               </div>
-              <div className="chat-bubble">{chat.message}</div>
+            ))
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              Loading Chats ...
             </div>
-          ))}
+          )}
+
+          {/* Dummy div to scroll to bottom */}
+          <div ref={bottomRef} />
         </div>
 
         {/* Input Box */}
@@ -170,11 +227,18 @@ const ChatWindow = ({ receiver }) => {
             </button>
             <input
               type="text"
+              value={inputMessage}
               placeholder="Type your message..."
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="w-full bg-transparent outline-none text-base-content pl-2"
             />
 
-            <button className=" text-2xl text-primary" title="Send">
+            <button
+              className=" text-2xl text-primary"
+              title="Send"
+              onClick={handleSend}
+            >
               <BiSolidSend />
             </button>
           </div>
