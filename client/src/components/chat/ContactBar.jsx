@@ -4,24 +4,11 @@ import { HiDotsVertical } from "react-icons/hi";
 import { useAuth } from "../../context/AuthContext";
 import { FaMoon } from "react-icons/fa";
 import { LuLogOut } from "react-icons/lu";
+import { GoDotFill } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import ThemeModal from "./modals/ThemeModal";
 import api from "../../config/Api";
-
-const DummyRecentContact = [
-  {
-    _id: 9,
-    fullName: "Rohit Agarwal",
-    email: "rohit.agarwal@example.com",
-    phoneNumber: "9090909090",
-  },
-  {
-    _id: 10,
-    fullName: "Pooja Kapoor",
-    email: "pooja.kapoor@example.com",
-    phoneNumber: "9887766554",
-  },
-];
+import socketApi from "../../config/WebSocket";
 
 const titles = {
   recentChat: "Recent Chats",
@@ -31,11 +18,14 @@ const titles = {
 };
 
 const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
+  const { user, setUser, setIsLogin } = useAuth();
+
   const navigate = useNavigate();
+
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [themeModalOpen, setThemeModalOpen] = useState(false);
-  const { user, setUser, setIsLogin } = useAuth();
+  const [onlineUsers, setOnlineUsers] = useState();
 
   const fetchContacts = async () => {
     setLoading(true);
@@ -57,9 +47,20 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
   };
 
   useEffect(() => {
-    // Simulate fetching contacts from an API when the component mounts
     fetchContacts();
   }, [fetchMode]);
+
+  const handleOnlineUsers = (onlineList) => {
+    setOnlineUsers(onlineList);
+  };
+
+  useEffect(() => {
+    socketApi.on("OnlineUsers", handleOnlineUsers);
+
+    return () => {
+      socketApi.off("OnlineUsers", handleOnlineUsers);
+    };
+  }, [contacts, handleOnlineUsers]);
 
   const handleLogout = () => {
     try {
@@ -181,11 +182,15 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
 
                   {/* Contact Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-base-content">
-                      {contact.fullName}
-                    </h3>
-                    {/* email to verify */}
-                    <p className="text-sm text-base-content">{contact.email}</p>
+                    <div className="flex items-center gap-2 justify-between">
+                      <h3 className="font-semibold text-base-content">
+                        {contact.fullName}
+                      </h3>
+                      {/* <GoDotFill  color="green"/> */}
+                      {onlineUsers && onlineUsers[contact._id] && (
+                        <span className="text-green-500 text-xs">Online</span>
+                      )}
+                    </div>
                     <p className="text-sm text-base-content/70 truncate">
                       Lorem ipsum dolor sit amet consectetur adipisicing elit.
                       Dolores, ea doloremque consectetur illo ex saepe fugit

@@ -16,8 +16,6 @@ const ChatWindow = ({ receiver }) => {
   const senderId = user?._id || 1; // Replace with actual logged-in user ID
   const receiverId = receiver?._id || 2; // Replace with actual receiver ID
 
-  const timestamp = new Date().toISOString();
-
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
@@ -33,16 +31,17 @@ const ChatWindow = ({ receiver }) => {
       message: inputMessage,
     };
 
+    const timestamp = new Date().toISOString();
+
     try {
-      // const res = await api.post(`/user/sendMessage/${receiverId}`, {
-      //   inputMessage,
-      // });
-      // socketApi.emit("send", messagePacket);
-      setInputMessage("");
-      setMessages((prev) => [
-        ...prev,
-        { ...messagePacket, createdAt: timestamp, updatedAt: timestamp },
-      ]);
+      if (socketApi.connected) {
+        socketApi.emit("send", messagePacket);
+        setInputMessage("");
+        setMessages((prev) => [
+          ...prev,
+          { ...messagePacket, createdAt: timestamp, updatedAt: timestamp },
+        ]);
+      }
     } catch (error) {
       console.log(error);
       toast.error(error?.response?.data?.message || "Message Sending Failed");
@@ -62,8 +61,13 @@ const ChatWindow = ({ receiver }) => {
     }
   };
 
+  const handleReceiveMessage = (newMessagePack) => {
+    setMessages((prev) => [...prev, newMessagePack]);
+  };
+
   //on component Load
   useEffect(() => {
+    // scrolltoBottom();
     setMessages([]);
     if (receiver) {
       fetchAllOldMessage();
@@ -71,9 +75,14 @@ const ChatWindow = ({ receiver }) => {
   }, [receiver]);
 
   //On Every New Message
-  useEffect(() => {
+  useEffect(() => { 
     scrolltoBottom();
-  }, [messages]);
+    socketApi.on("recieve", handleReceiveMessage);
+
+    return () => {
+      socketApi.off("recieve", handleReceiveMessage);
+    };
+  }, [receiverId, handleReceiveMessage]);
 
   const handleKeyDown = (e) => {
     e.key === "Enter" && handleSend();

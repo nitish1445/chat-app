@@ -12,10 +12,12 @@ const Chatting = () => {
   const { user, isLogin } = useAuth();
 
   useEffect(() => {
+    //if user is on chatting page use socket and make path
     if (user) {
       socketApi.emit("createPath", user._id);
     }
 
+    //meanwhile delete same path on page switch
     return () => {
       socketApi.emit("destroyPath", user._id);
     };
