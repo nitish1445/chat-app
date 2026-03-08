@@ -7,13 +7,16 @@ import { ImAttachment } from "react-icons/im";
 import { FaCircleNotch } from "react-icons/fa";
 import api from "../../config/Api";
 import { useAuth } from "../../context/AuthContext";
+import socketApi from "../../config/WebSocket";
 
 const ChatWindow = ({ receiver }) => {
   const { user } = useAuth();
   const bottomRef = useRef(null);
 
-  const senderId = user?.id || 1; // Replace with actual logged-in user ID
+  const senderId = user?._id || 1; // Replace with actual logged-in user ID
   const receiverId = receiver?._id || 2; // Replace with actual receiver ID
+
+  const timestamp = new Date().toISOString();
 
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -31,11 +34,15 @@ const ChatWindow = ({ receiver }) => {
     };
 
     try {
-      const res = await api.post(`/user/sendMessage/${receiverId}`, {
-        inputMessage,
-      });
+      // const res = await api.post(`/user/sendMessage/${receiverId}`, {
+      //   inputMessage,
+      // });
+      // socketApi.emit("send", messagePacket);
       setInputMessage("");
-      setMessages((prev) => [...prev, res.data.data]);
+      setMessages((prev) => [
+        ...prev,
+        { ...messagePacket, createdAt: timestamp, updatedAt: timestamp },
+      ]);
     } catch (error) {
       console.log(error);
       toast.error(error?.response?.data?.message || "Message Sending Failed");

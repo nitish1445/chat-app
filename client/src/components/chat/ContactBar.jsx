@@ -109,9 +109,7 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                       <h3 className="font-semibold text-base-content">
                         {user.fullName}
                       </h3>
-                      <p className="text-sm text-base-content">
-                        {user.email}
-                      </p>
+                      <p className="text-sm text-base-content">{user.email}</p>
                     </div>
                   </div>
                 </div>
@@ -186,9 +184,13 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                     <h3 className="font-semibold text-base-content">
                       {contact.fullName}
                     </h3>
-
+                    {/* email to verify */}
+                    <p className="text-sm text-base-content">{contact.email}</p>
                     <p className="text-sm text-base-content/70 truncate">
-                      Lorem ipsum dolor sit amet reff of the d efhff ...
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      Dolores, ea doloremque consectetur illo ex saepe fugit
+                      quisquam fugiat, iste recusandae alias, facere similique
+                      hic maxime quae! Sequi animi consectetur ullam!
                     </p>
                   </div>
                 </div>

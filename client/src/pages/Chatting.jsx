@@ -1,14 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import QuickNavigation from "../components/chat/QuickNavigation";
 import ContactBar from "../components/chat/ContactBar";
 import ChatWindow from "../components/chat/ChatWindow";
 import { useAuth } from "../context/AuthContext";
+import socketApi from "../config/WebSocket";
 
 const Chatting = () => {
   const [fetchMode, setFetchMode] = useState("allChat");
   const [receiver, setReceiver] = useState(null);
   const { user, isLogin } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      socketApi.emit("createPath", user._id);
+    }
+
+    return () => {
+      socketApi.emit("destroyPath", user._id);
+    };
+  }, []);
 
   return (
     <>

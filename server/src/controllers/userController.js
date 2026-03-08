@@ -48,7 +48,9 @@ export const fetchMessages = async (req, res, next) => {
         { senderId: senderId, receiverId: receiverId },
         { senderId: receiverId, receiverId: senderId },
       ],
-    }).sort({ createdAt: 1 });
+    })
+      .select("-_id -__v")
+      .sort({ createdAt: 1 });
 
     //console.log(mychat);
 
