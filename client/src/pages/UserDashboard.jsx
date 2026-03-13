@@ -21,7 +21,7 @@ const UserDashboard = () => {
   const { user, setUser, setIsLogin } = useAuth();
 
   const currentUser =
-    user || JSON.parse(sessionStorage.getItem("AppUser") || "null");
+    user || JSON.parse(sessionStorage.getItem("ConverseUser") || "null");
   const [profileForm, setProfileForm] = useState(getProfileForm(currentUser));
   const [mobilePanel, setMobilePanel] = useState("summary");
 
@@ -30,12 +30,12 @@ const UserDashboard = () => {
   }, [user]);
 
   const userName =
-    currentUser?.fullName || currentUser?.name || "DostiHUB User";
+    currentUser?.fullName || currentUser?.name || "User";
   const userEmail = currentUser?.email || "No email found";
   const userPhone =
     currentUser?.phone || currentUser?.phone || "Not added yet";
   const userAbout =
-    currentUser?.about || "Tell people about yourself in a few lines.";
+    currentUser?.about || "Hey there! I am using Converse";
 
   const completedProfileFields = [
     currentUser?.fullName || currentUser?.name,
@@ -53,7 +53,7 @@ const UserDashboard = () => {
     .join("");
 
   const handleLogout = () => {
-    sessionStorage.removeItem("AppUser");
+    sessionStorage.removeItem("ConverseUser");
     setUser(null);
     setIsLogin(false);
     navigate("/login");
@@ -95,7 +95,7 @@ const UserDashboard = () => {
       about: profileForm.about.trim(),
     };
 
-    sessionStorage.setItem("AppUser", JSON.stringify(updatedUser));
+    sessionStorage.setItem("ConverseUser", JSON.stringify(updatedUser));
     setUser(updatedUser);
     toast.success("Profile updated successfully");
   };

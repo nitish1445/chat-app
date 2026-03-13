@@ -35,7 +35,7 @@ const Chatting = () => {
               setReceiver={setReceiver}
             />
           </div>
-          <div className="w-96 border-r border-base-300 overflow-hidden">
+          <div className="w-60 md:w-72 lg:w-96 border-r border-base-300 overflow-hidden">
             <ContactBar
               fetchMode={fetchMode}
               receiver={receiver}

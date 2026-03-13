@@ -13,13 +13,14 @@ const ChatWindow = ({ receiver }) => {
   const { user } = useAuth();
   const bottomRef = useRef(null);
 
-  const senderId = user?._id || 1; // Replace with actual logged-in user ID
-  const receiverId = receiver?._id || 2; // Replace with actual receiver ID
+  const senderId = user?._id;
+  const receiverId = receiver?._id; //Replace with actual receiver ID
 
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
 
+  // new chat at bottom
   const scrolltoBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -67,7 +68,6 @@ const ChatWindow = ({ receiver }) => {
 
   //on component Load
   useEffect(() => {
-    // scrolltoBottom();
     setMessages([]);
     if (receiver) {
       fetchAllOldMessage();
@@ -75,7 +75,7 @@ const ChatWindow = ({ receiver }) => {
   }, [receiver]);
 
   //On Every New Message
-  useEffect(() => { 
+  useEffect(() => {
     scrolltoBottom();
     socketApi.on("recieve", handleReceiveMessage);
 
