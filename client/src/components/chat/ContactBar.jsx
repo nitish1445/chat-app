@@ -106,7 +106,9 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                     </div>
 
                     {/* User Info */}
-                    <div className="flex-1 min-w-0">
+                    <div onClick={() => {
+                        navigate("/user-dashboard");
+                      }} className="flex-1 min-w-0">
                       <h3 className="font-semibold text-base-content">
                         {user.fullName}
                       </h3>
@@ -145,11 +147,12 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
         )}
 
         {/* PROFILE PAGE */}
-        {fetchMode === "profile" && (
+        
+        {/* {fetchMode === "profile" && (
           <div className="flex-1 flex items-center justify-center">
             <p className="text-base-content">Profile Page</p>
           </div>
-        )}
+        )} */}
 
         {/* Contact List */}
         {(fetchMode === "recentChat" || fetchMode === "allChat") && (
@@ -176,8 +179,9 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                     <div className=" bg-primary text-primary-content rounded-full w-10">
                       <span className="flex items-center justify-center text-sm font-semibold w-10 h-10">
                         {contact.fullName?.charAt(0)}
-                         {onlineUsers && onlineUsers[contact._id] && (<GoDotFill className="absolute bottom-0 -right-1 z-10 text-green-400 text-lg" />)}
-                        
+                        {onlineUsers && onlineUsers[contact._id] && (
+                          <GoDotFill className="absolute bottom-0 -right-1 z-10 text-green-400 text-lg" />
+                        )}
                       </span>
                     </div>
                   </div>
@@ -188,7 +192,6 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                       <h3 className="font-semibold text-base-content">
                         {contact.fullName}
                       </h3>
-                     
                     </div>
                     <p className="text-sm text-base-content/70 truncate">
                       Lorem ipsum dolor sit amet consectetur adipisicing elit.

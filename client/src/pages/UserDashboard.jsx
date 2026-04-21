@@ -3,55 +3,57 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 
-const profileHints = [
-  "Ye name aapke contacts ko dikhega.",
-  "About me ko short aur clear rakho.",
-  "Email aur phone account recovery me kaam aayega.",
-];
-
-const getProfileForm = (account) => ({
-  fullName: account?.fullName || account?.name || "",
-  email: account?.email || "",
-  mobileNumber: account?.mobileNumber || account?.phoneNumber || "",
-  about: account?.about || "",
-});
+// simple function for form default values
+const getProfileForm = (data) => {
+  return {
+    fullName: data?.fullName || "",
+    email: data?.email || "",
+    phone: data?.phone || "",
+    about: data?.about || "Hey there ! I am using Converse.",
+  };
+};
 
 const UserDashboard = () => {
   const navigate = useNavigate();
   const { user, setUser, setIsLogin } = useAuth();
 
+  // get current user
   const currentUser =
-    user || JSON.parse(sessionStorage.getItem("ConverseUser") || "null");
+    user || JSON.parse(sessionStorage.getItem("ConverseUser")) || null;
+
   const [profileForm, setProfileForm] = useState(getProfileForm(currentUser));
   const [mobilePanel, setMobilePanel] = useState("summary");
 
+  // update form when user changes
   useEffect(() => {
     setProfileForm(getProfileForm(currentUser));
   }, [user]);
 
-  const userName =
-    currentUser?.fullName || currentUser?.name || "User";
+  // show on profile page
+  const userName = currentUser?.fullName || "User";
   const userEmail = currentUser?.email || "No email found";
-  const userPhone =
-    currentUser?.phone || currentUser?.phone || "Not added yet";
-  const userAbout =
-    currentUser?.about || "Hey there! I am using Converse";
+  const userPhone = currentUser?.phone || "Not added yet";
+  const userAbout = currentUser?.about || "Hey there ! I am using Converse.";
 
-  const completedProfileFields = [
-    currentUser?.fullName || currentUser?.name,
-    currentUser?.email,
-    currentUser?.phone || currentUser?.phone,
-    currentUser?.about,
-  ].filter(Boolean).length;
-  const profileStrength = Math.min(100, completedProfileFields * 25);
+  // profile strength
+  let count = 0;
 
+  if (userName) count++;
+  if (currentUser?.email) count++;
+  if (userPhone !== "Not added yet") count++;
+  if (currentUser?.about || "Hey there ! I am using Converse.") count++;
+
+  const profileStrength = count * 25;
+
+  // initials
   const initials = userName
     .split(" ")
-    .filter(Boolean)
+    .map((word) => word[0])
+    .join("")
     .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
+    .toUpperCase();
 
+  // logout
   const handleLogout = () => {
     sessionStorage.removeItem("ConverseUser");
     setUser(null);
@@ -59,44 +61,46 @@ const UserDashboard = () => {
     navigate("/login");
   };
 
-  const handleProfileChange = (event) => {
-    const { name, value } = event.target;
-    setProfileForm((prev) => ({ ...prev, [name]: value }));
+  const handleProfileChange = (e) => {
+    const { name, value } = e.target;
+    setProfileForm({
+      ...profileForm,
+      [name]: value,
+    });
   };
 
   const handleResetProfile = () => {
     setProfileForm(getProfileForm(currentUser));
   };
 
-  const handleSaveProfile = (event) => {
-    event.preventDefault();
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
 
     if (
       profileForm.email &&
       !/^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(profileForm.email)
     ) {
-      toast.error("Please enter a valid email address.");
+      toast.error("Please enter valid email");
       return;
     }
 
-    if (
-      profileForm.mobileNumber &&
-      !/^[0-9]{10,15}$/.test(profileForm.mobileNumber)
-    ) {
-      toast.error("Phone number should contain 10 to 15 digits.");
+    // phone validation
+    if (profileForm.phone && !/^[0-9]{10,15}$/.test(profileForm.phone)) {
+      toast.error("Phone number must be 10 to 15 digits");
       return;
     }
 
     const updatedUser = {
-      ...(currentUser || {}),
+      ...currentUser,
       fullName: profileForm.fullName.trim(),
       email: profileForm.email.trim(),
-      mobileNumber: profileForm.mobileNumber.trim(),
+      phone: profileForm.phone.trim(),
       about: profileForm.about.trim(),
     };
 
     sessionStorage.setItem("ConverseUser", JSON.stringify(updatedUser));
     setUser(updatedUser);
+
     toast.success("Profile updated successfully");
   };
 
@@ -201,13 +205,6 @@ const UserDashboard = () => {
                     Open Chats
                   </Link>
                   <button
-                    type="button"
-                    className="btn btn-outline lg:hidden"
-                    onClick={() => setMobilePanel("edit")}
-                  >
-                    Edit Profile
-                  </button>
-                  <button
                     className="btn btn-outline btn-error"
                     onClick={handleLogout}
                   >
@@ -231,7 +228,7 @@ const UserDashboard = () => {
                   onReset={handleResetProfile}
                   className="space-y-4"
                 >
-                  <div className="rounded-xl border border-base-300 bg-base-100 p-3">
+                  <div className="rounded-xl  bg-base-100 p-3">
                     <label className="text-primary mb-1 block text-xs font-semibold uppercase tracking-wide">
                       Name
                     </label>
@@ -245,7 +242,7 @@ const UserDashboard = () => {
                     />
                   </div>
 
-                  <div className="rounded-xl border border-base-300 bg-base-100 p-3">
+                  <div className="rounded-xl  bg-base-100 p-3">
                     <label className="text-primary mb-1 block text-xs font-semibold uppercase tracking-wide">
                       About
                     </label>
@@ -254,13 +251,13 @@ const UserDashboard = () => {
                       placeholder="Hey there! I am using Converse"
                       value={profileForm.about}
                       onChange={handleProfileChange}
-                      rows={3}
+                      rows={2}
                       className="textarea textarea-bordered w-full"
                     />
                   </div>
 
                   <div className="grid gap-4 md:grid-cols-2">
-                    <div className="rounded-xl border border-base-300 bg-base-100 p-3">
+                    <div className="rounded-xl bg-base-100 p-3">
                       <label className="text-primary mb-1 block text-xs font-semibold uppercase tracking-wide">
                         Email
                       </label>
@@ -274,18 +271,24 @@ const UserDashboard = () => {
                       />
                     </div>
 
-                    <div className="rounded-xl border border-base-300 bg-base-100 p-3">
+                    <div className="rounded-xl  bg-base-100 p-3">
                       <label className="text-primary mb-1 block text-xs font-semibold uppercase tracking-wide">
                         Phone
                       </label>
-                      <input
-                        type="tel"
-                        name="mobileNumber"
-                        placeholder="10-15 digit number"
-                        value={profileForm.phone}
-                        onChange={handleProfileChange}
-                        className="input input-bordered h-11 w-full"
-                      />
+                      <div className="relative">
+                        <input
+                          type="tel"
+                          name="mobileNumber"
+                          placeholder="Enter mobile number"
+                          value={profileForm.mobileNumber}
+                          onChange={handleProfileChange}
+                          className="input input-bordered h-11 w-full pl-10 rounded-xl"
+                        />
+
+                        <div className="absolute left-0 top-0 h-11.5 w-12 flex items-center justify-center  font-medium text-base-content  rounded-l-xl">
+                          +91
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -302,7 +305,7 @@ const UserDashboard = () => {
                     </ul>
                   </div> */}
 
-                  <div className="flex gap-2">
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
                     <button type="reset" className="btn btn-outline flex-1">
                       Reset
                     </button>
@@ -311,13 +314,13 @@ const UserDashboard = () => {
                     </button>
                   </div>
 
-                  <button
+                  {/* <button
                     type="button"
                     className="btn btn-outline mt-2 w-full lg:hidden"
                     onClick={() => setMobilePanel("summary")}
                   >
                     Back to Profile
-                  </button>
+                  </button> */}
                 </form>
               </section>
             </div>
