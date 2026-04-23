@@ -8,7 +8,8 @@ import { GoDotFill } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import ThemeModal from "./modals/ThemeModal";
 import api from "../../config/Api";
-import socketApi from "../../config/WebSocket";
+import { MdKey } from "react-icons/md";
+import AccountModal from "./modals/AccountModal";
 
 const titles = {
   recentChat: "Recent Chats",
@@ -17,7 +18,7 @@ const titles = {
   settings: "Settings",
 };
 
-const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
+const ContactBar = ({ fetchMode, receiver, setReceiver, onlineUsers }) => {
   const { user, setUser, setIsLogin } = useAuth();
 
   const navigate = useNavigate();
@@ -25,7 +26,38 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [themeModalOpen, setThemeModalOpen] = useState(false);
-  const [onlineUsers, setOnlineUsers] = useState();
+   const [accountModalOpen, setAccountModalOpen] = useState(false);
+  const [latestMessages, setLatestMessages] = useState({});
+
+  const fetchLatestMessages = async (contactList) => {
+    if (!contactList?.length) {
+      setLatestMessages({});
+      return;
+    }
+
+    const previews = await Promise.all(
+      contactList.map(async (contact) => {
+        try {
+          const res = await api.get(`/user/fetchMessages/${contact._id}`);
+          const chatHistory = res?.data?.data || [];
+          const lastMessage = chatHistory[chatHistory.length - 1];
+
+          if (!lastMessage?.message) {
+            return [contact._id, `${contact.fullName} joined Converse!`];
+          }
+
+          const senderPrefix =
+            String(lastMessage.senderId) === String(user?._id) ? "You: " : "";
+
+          return [contact._id, `${senderPrefix}${lastMessage.message}`];
+        } catch (error) {
+          return [contact._id, `${contact.fullName} joined Converse!`];
+        }
+      }),
+    );
+
+    setLatestMessages(Object.fromEntries(previews));
+  };
 
   const fetchContacts = async () => {
     setLoading(true);
@@ -34,10 +66,13 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
       if (fetchMode === "recentChat") {
         console.log("Calling recents");
         // setContacts(DummyRecentContact);
+        setLatestMessages({});
       } else if (fetchMode === "allChat") {
         console.log("Calling All");
         res = await api.get("/user/allUsers");
-        setContacts(res.data.data);
+        const allContacts = res?.data?.data || [];
+        setContacts(allContacts);
+        await fetchLatestMessages(allContacts);
       }
     } catch (error) {
       toast.error("Failed to load contacts. Please try again.");
@@ -49,18 +84,6 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
   useEffect(() => {
     fetchContacts();
   }, [fetchMode]);
-
-  const handleOnlineUsers = (onlineList) => {
-    setOnlineUsers(onlineList);
-  };
-
-  useEffect(() => {
-    socketApi.on("OnlineUsers", handleOnlineUsers);
-
-    return () => {
-      socketApi.off("OnlineUsers", handleOnlineUsers);
-    };
-  }, [contacts, handleOnlineUsers]);
 
   const handleLogout = () => {
     try {
@@ -106,9 +129,12 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                     </div>
 
                     {/* User Info */}
-                    <div onClick={() => {
+                    <div
+                      onClick={() => {
                         navigate("/user-dashboard");
-                      }} className="flex-1 min-w-0">
+                      }}
+                      className="flex-1 min-w-0"
+                    >
                       <h3 className="font-semibold text-base-content">
                         {user.fullName}
                       </h3>
@@ -131,6 +157,19 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                 </div>
 
                 <div
+                  className="p-3 rounded-xl cursor-pointer hover:bg-base-300 transition mt-2"
+                  onClick={() => setAccountModalOpen(true)}
+                >
+                  <button className="flex items-center gap-5">
+                    <div className="text-xl text-primary">
+                      <MdKey />
+                    </div>
+
+                    <h3 className="font-semibold text-base-content">Account</h3>
+                  </button>
+                </div>
+
+                <div
                   className="p-3 rounded-xl cursor-pointer hover:bg-red-50 transition mt-2"
                   onClick={handleLogout}
                 >
@@ -146,14 +185,6 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
           </div>
         )}
 
-        {/* PROFILE PAGE */}
-        
-        {/* {fetchMode === "profile" && (
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-base-content">Profile Page</p>
-          </div>
-        )} */}
-
         {/* Contact List */}
         {(fetchMode === "recentChat" || fetchMode === "allChat") && (
           <div className="flex-1 p-2 overflow-y-auto space-y-1">
@@ -166,7 +197,7 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
             ) : (
               contacts.map((contact) => (
                 <div
-                  key={contact.id}
+                  key={contact._id}
                   onClick={() => setReceiver(contact)}
                   className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-base-300 transition ${
                     receiver?._id === contact._id
@@ -178,7 +209,7 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                   <div className="avatar relative">
                     <div className=" bg-primary text-primary-content rounded-full w-10">
                       <span className="flex items-center justify-center text-sm font-semibold w-10 h-10">
-                        {contact.fullName?.charAt(0)}
+                        {contact.fullName?.charAt(0) || "#"}
                         {onlineUsers && onlineUsers[contact._id] && (
                           <GoDotFill className="absolute bottom-0 -right-1 z-10 text-green-400 text-lg" />
                         )}
@@ -192,12 +223,11 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
                       <h3 className="font-semibold text-base-content">
                         {contact.fullName}
                       </h3>
+                      <p className="text-xs text-gray-500">today</p>
                     </div>
                     <p className="text-sm text-base-content/70 truncate">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      Dolores, ea doloremque consectetur illo ex saepe fugit
-                      quisquam fugiat, iste recusandae alias, facere similique
-                      hic maxime quae! Sequi animi consectetur ullam!
+                      {latestMessages[contact._id] ||
+                        `${contact.fullName} joined Converse!`}
                     </p>
                   </div>
                 </div>
@@ -209,6 +239,9 @@ const ContactBar = ({ fetchMode, receiver, setReceiver }) => {
 
       {themeModalOpen && (
         <ThemeModal onClose={() => setThemeModalOpen(false)} />
+      )}
+      {accountModalOpen && (
+        <AccountModal onClose={() => setAccountModalOpen(false)} />
       )}
     </>
   );

@@ -11,7 +11,7 @@ import api from "../../config/Api";
 import { useAuth } from "../../context/AuthContext";
 import socketApi from "../../config/WebSocket";
 
-const ChatWindow = ({ receiver, setReceiver }) => {
+const ChatWindow = ({ receiver, setReceiver, onlineUsers }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const bottomRef = useRef(null);
@@ -79,7 +79,7 @@ const ChatWindow = ({ receiver, setReceiver }) => {
     return () => {
       socketApi.off("recieve", handleReceiveMessage);
     };
-  }, [receiverId]);
+  }, [receiverId, handleReceiveMessage]);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSend();
@@ -117,9 +117,19 @@ const ChatWindow = ({ receiver, setReceiver }) => {
             </div>
           </div>
 
-          <h2 className="text-lg font-semibold text-base-content capitalize">
-            {receiver.fullName}
-          </h2>
+          {/* Tap on user to access their profile */}
+          <button>
+            <h2 className="text-lg font-semibold text-base-content capitalize leading-tight">
+              {receiver.fullName}
+            </h2>
+            {onlineUsers?.[receiverId] ? (
+              <p className="text-xs text-green-500 font-medium">Active Now</p>
+            ) : (
+              <p className="text-xs text-gray-500 font-medium">
+                Last seen recently
+              </p>
+            )}
+          </button>
         </div>
 
         <button className="p-2 rounded-lg hover:bg-base-300 transition">
@@ -128,7 +138,7 @@ const ChatWindow = ({ receiver, setReceiver }) => {
       </div>
 
       {/* Chat Section */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-accent/30 pb-20 md:pb-4">
+      <div className="flex-1 overflow-y-auto px-4 space-y-1 bg-accent/30 md:pb-4">
         {messages.length > 0 ? (
           messages.map((chat, idx) => (
             <div

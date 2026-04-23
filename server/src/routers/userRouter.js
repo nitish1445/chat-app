@@ -3,6 +3,7 @@ import {
   getAllUsers,
   fetchMessages,
   sendMessage,
+  updateUser,
 } from "../controllers/userController.js";
 import { Protect } from "../middlewares/authMiddleware.js";
 
@@ -16,5 +17,8 @@ router.get("/fetchMessages/:receiverId", Protect, fetchMessages);
 
 // send new Messages between 2 users
 router.post("/sendMessage/:receiverId", Protect, sendMessage);
+
+//update user details
+router.post("/update", Protect, updateUser);
 
 export default router;

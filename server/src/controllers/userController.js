@@ -92,3 +92,29 @@ export const sendMessage = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateUser = async (req, res, next) => {
+  try {
+    const currentUser = req.user;
+    if (!currentUser) {
+      const error = new Error("Unauthorized");
+      error.statusCode = 401;
+      return next(error);
+    }
+    const { fullName, about } = req.body;
+    if (!fullName || !about) {
+      const error = new Error("Only fullName and about can be updated");
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      currentUser._id,
+      { fullName, about },
+      { new: true, runValidators: true },
+    ).select("-password -__v");
+    res.status(200).json({ data: updatedUser, message: "User details updated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};

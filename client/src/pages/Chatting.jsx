@@ -9,6 +9,7 @@ import socketApi from "../config/WebSocket";
 const Chatting = () => {
   const [fetchMode, setFetchMode] = useState("allChat");
   const [receiver, setReceiver] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState({});
   const { user, isLogin } = useAuth();
 
   useEffect(() => {
@@ -22,6 +23,18 @@ const Chatting = () => {
       }
     };
   }, [user]);
+
+  useEffect(() => {
+    const handleOnlineUsers = (onlineList) => {
+      setOnlineUsers(onlineList || {});
+    };
+
+    socketApi.on("OnlineUsers", handleOnlineUsers);
+
+    return () => {
+      socketApi.off("OnlineUsers", handleOnlineUsers);
+    };
+  }, []);
 
   if (!(isLogin || user)) {
     return (
@@ -75,6 +88,7 @@ const Chatting = () => {
           fetchMode={fetchMode}
           receiver={receiver}
           setReceiver={setReceiver}
+          onlineUsers={onlineUsers}
         />
       </div>
 
@@ -89,6 +103,7 @@ const Chatting = () => {
           fetchMode={fetchMode}
           receiver={receiver}
           setReceiver={setReceiver}
+          onlineUsers={onlineUsers}
         />
       </div>
 
@@ -102,6 +117,7 @@ const Chatting = () => {
         <ChatWindow
           receiver={receiver}
           setReceiver={setReceiver}
+          onlineUsers={onlineUsers}
         />
       </div>
     </div>

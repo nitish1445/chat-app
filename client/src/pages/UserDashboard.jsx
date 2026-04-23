@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
+import api from "../config/Api";
 
 // simple function for form default values
-const getProfileForm = (data) => {
+const userDetail = (currentUserData) => {
   return {
-    fullName: data?.fullName || "",
-    email: data?.email || "",
-    phone: data?.phone || "",
-    about: data?.about || "Hey there ! I am using Converse.",
+    fullName: currentUserData?.fullName || "",
+    email: currentUserData?.email || "",
+    phone: currentUserData?.phone || "",
+    about: currentUserData?.about || "Hey there!! I am using Converse.",
   };
 };
 
@@ -17,35 +18,25 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const { user, setUser, setIsLogin } = useAuth();
 
-  // get current user
+  // get current user detail
   const currentUser =
     user || JSON.parse(sessionStorage.getItem("ConverseUser")) || null;
 
-  const [profileForm, setProfileForm] = useState(getProfileForm(currentUser));
+  const [editProfile, setEditProfile] = useState(userDetail(currentUser));
   const [mobilePanel, setMobilePanel] = useState("summary");
 
   // update form when user changes
   useEffect(() => {
-    setProfileForm(getProfileForm(currentUser));
+    setEditProfile(userDetail(currentUser));
   }, [user]);
 
   // show on profile page
-  const userName = currentUser?.fullName || "User";
-  const userEmail = currentUser?.email || "No email found";
-  const userPhone = currentUser?.phone || "Not added yet";
-  const userAbout = currentUser?.about || "Hey there ! I am using Converse.";
+  const userName = currentUser?.fullName;
+  const userEmail = currentUser?.email;
+  const userPhone = currentUser?.phone;
+  const userAbout = currentUser?.about || "Hey there!! I am using Converse.";
 
-  // profile strength
-  let count = 0;
-
-  if (userName) count++;
-  if (currentUser?.email) count++;
-  if (userPhone !== "Not added yet") count++;
-  if (currentUser?.about || "Hey there ! I am using Converse.") count++;
-
-  const profileStrength = count * 25;
-
-  // initials
+  // Name initials
   const initials = userName
     .split(" ")
     .map((word) => word[0])
@@ -63,45 +54,36 @@ const UserDashboard = () => {
 
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
-    setProfileForm({
-      ...profileForm,
+    setEditProfile({
+      ...editProfile,
       [name]: value,
     });
   };
 
   const handleResetProfile = () => {
-    setProfileForm(getProfileForm(currentUser));
+    setEditProfile(userDetail(currentUser));
   };
 
-  const handleSaveProfile = (e) => {
+  // updated user detail
+  const updatedUser = {
+    ...currentUser,
+    fullName: editProfile.fullName.trim(),
+    email: editProfile.email.trim(),
+    phone: editProfile.phone.trim(),
+    about: editProfile.about.trim(),
+  };
+
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
-
-    if (
-      profileForm.email &&
-      !/^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(profileForm.email)
-    ) {
-      toast.error("Please enter valid email");
-      return;
+    try {
+      const res = await api.post("/user/update", updatedUser);
+      sessionStorage.setItem("ConverseUser", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      toast.success(res?.data?.message);
+    } catch (error) {
+      console.log(error.message);
+      toast.error(res?.error?.data?.message || "Internal Error");
     }
-
-    // phone validation
-    if (profileForm.phone && !/^[0-9]{10,15}$/.test(profileForm.phone)) {
-      toast.error("Phone number must be 10 to 15 digits");
-      return;
-    }
-
-    const updatedUser = {
-      ...currentUser,
-      fullName: profileForm.fullName.trim(),
-      email: profileForm.email.trim(),
-      phone: profileForm.phone.trim(),
-      about: profileForm.about.trim(),
-    };
-
-    sessionStorage.setItem("ConverseUser", JSON.stringify(updatedUser));
-    setUser(updatedUser);
-
-    toast.success("Profile updated successfully");
   };
 
   return (
@@ -149,7 +131,7 @@ const UserDashboard = () => {
                 <div className="flex flex-col items-center text-center">
                   <div className="avatar avatar-placeholder">
                     <div className="bg-primary text-primary-content h-24 w-24 rounded-full text-3xl font-bold">
-                      <span>{initials || "DU"}</span>
+                      <span>{initials}</span>
                     </div>
                   </div>
 
@@ -157,20 +139,6 @@ const UserDashboard = () => {
                     {userName}
                   </h1>
                   <p className="text-sm text-base-content/70">Available</p>
-
-                  <div className="mt-4 w-full rounded-xl bg-base-100 p-3 text-left">
-                    <p className="text-primary text-xs font-semibold uppercase tracking-wide">
-                      Profile Strength
-                    </p>
-                    <p className="mt-1 text-2xl font-bold text-base-content">
-                      {profileStrength}%
-                    </p>
-                    <progress
-                      className="progress progress-success mt-2 h-2 w-full"
-                      value={profileStrength}
-                      max="100"
-                    />
-                  </div>
                 </div>
 
                 <div className="mt-4 space-y-3">
@@ -236,9 +204,9 @@ const UserDashboard = () => {
                       type="text"
                       name="fullName"
                       placeholder="Your display name"
-                      value={profileForm.fullName}
+                      value={editProfile.fullName}
                       onChange={handleProfileChange}
-                      className="input input-bordered h-11 w-full"
+                      className="input input-bordered h-11 w-full rounded-lg"
                     />
                   </div>
 
@@ -246,13 +214,12 @@ const UserDashboard = () => {
                     <label className="text-primary mb-1 block text-xs font-semibold uppercase tracking-wide">
                       About
                     </label>
-                    <textarea
+                    <input
                       name="about"
                       placeholder="Hey there! I am using Converse"
-                      value={profileForm.about}
+                      value={editProfile.about}
                       onChange={handleProfileChange}
-                      rows={2}
-                      className="textarea textarea-bordered w-full"
+                      className="input input-bordered w-full rounded-lg"
                     />
                   </div>
 
@@ -265,9 +232,9 @@ const UserDashboard = () => {
                         type="email"
                         name="email"
                         placeholder="name@email.com"
-                        value={profileForm.email}
+                        value={editProfile.email}
                         onChange={handleProfileChange}
-                        className="input input-bordered h-11 w-full"
+                        className="input input-bordered h-11 w-full rounded-lg"
                       />
                     </div>
 
@@ -278,32 +245,19 @@ const UserDashboard = () => {
                       <div className="relative">
                         <input
                           type="tel"
-                          name="mobileNumber"
+                          name="phone"
                           placeholder="Enter mobile number"
-                          value={profileForm.mobileNumber}
+                          value={editProfile.phone}
                           onChange={handleProfileChange}
-                          className="input input-bordered h-11 w-full pl-10 rounded-xl"
+                          className="input input-bordered h-11 w-full pl-11 rounded-lg"
                         />
 
-                        <div className="absolute left-0 top-0 h-11.5 w-12 flex items-center justify-center  font-medium text-base-content  rounded-l-xl">
+                        <div className="absolute left-0 top-0 h-11.5 w-12 flex items-center justify-center  font-medium text-base-content rounded-l-xl">
                           +91
                         </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* <div className="rounded-xl border border-base-300 bg-base-100 p-3">
-                    <p className="text-primary text-xs font-semibold uppercase tracking-wide">
-                      Quick Tips
-                    </p>
-                    <ul className="mt-2 space-y-2 text-sm text-base-content/70">
-                      {profileHints.map((hint) => (
-                        <li key={hint} className="rounded-lg bg-base-200 p-2">
-                          {hint}
-                        </li>
-                      ))}
-                    </ul>
-                  </div> */}
 
                   <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
                     <button type="reset" className="btn btn-outline flex-1">
@@ -313,14 +267,6 @@ const UserDashboard = () => {
                       Save Changes
                     </button>
                   </div>
-
-                  {/* <button
-                    type="button"
-                    className="btn btn-outline mt-2 w-full lg:hidden"
-                    onClick={() => setMobilePanel("summary")}
-                  >
-                    Back to Profile
-                  </button> */}
                 </form>
               </section>
             </div>

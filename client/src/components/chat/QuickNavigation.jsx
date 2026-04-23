@@ -39,12 +39,12 @@ const QuickNavigation = ({ setFetchMode, setReceiver }) => {
           }}
         >
           <IoChatbubblesOutline className={iconSize} />
-          <span className="text-[10px] md:hidden">Recent</span>
+          <span className="text-[10px] md:hidden">Recent Chat</span>
         </button>
 
         {/* All Chats */}
         <button
-          title="All Chats"
+          title="All Contacts"
           className={navBtn}
           onClick={() => {
             setFetchMode("allChat");
@@ -52,7 +52,7 @@ const QuickNavigation = ({ setFetchMode, setReceiver }) => {
           }}
         >
           <MdOutlineChat className={iconSize} />
-          <span className="text-[10px] md:hidden">Chats</span>
+          <span className="text-[10px] md:hidden">All Contacts</span>
         </button>
 
         {/* Settings */}

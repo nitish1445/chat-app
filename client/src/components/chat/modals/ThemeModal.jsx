@@ -40,7 +40,7 @@ const ThemeModal = ({ onClose }) => {
     onClose();
   };
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center px-2 z-50">
       <div className="bg-base-100 border border-base-300 rounded-2xl w-full max-w-md py-4 shadow-2xl relative">
         {/* Header */}
         <h2 className="text-2xl font-bold text-center mb-6">Change Theme</h2>

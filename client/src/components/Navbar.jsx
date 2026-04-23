@@ -39,18 +39,18 @@ const Navbar = () => {
   return (
     <>
       {!isLogin && (
-        <div className="sticky top-0 z-40 bg-linear-to-r from-cyan-600 to-sky-600 shadow-lg shadow-cyan-900/20 flex justify-between py-3 px-8 items-center text-white">
+        <div className="sticky top-0 z-40 bg-linear-to-r from-cyan-600 to-sky-600 shadow-lg shadow-cyan-900/20 flex justify-between py-3 px-6 md:px-18 items-center text-white">
           {/* Logo */}
           <div className="text-xl font-bold">
             <Link to="/">Converse</Link>
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex gap-6">
+          {/* <div className="hidden md:flex gap-6">
             <Link to="/">Home</Link>
             <Link to="/about">About</Link>
             <Link to="/contact">Contact</Link>
-          </div>
+          </div> */}
 
           {/* Desktop Buttons */}
           <div className="hidden md:flex gap-3">
@@ -103,7 +103,7 @@ const Navbar = () => {
 
         {/* Links */}
         <nav className="flex flex-col gap-5 px-6 py-6 text-lg">
-          <Link to="/" onClick={() => setMenuOpen(false)}>
+          {/* <Link to="/" onClick={() => setMenuOpen(false)}>
             Home
           </Link>
           <Link to="/about" onClick={() => setMenuOpen(false)}>
@@ -111,9 +111,9 @@ const Navbar = () => {
           </Link>
           <Link to="/contact" onClick={() => setMenuOpen(false)}>
             Contact
-          </Link>
+          </Link> */}
 
-          <div className="border-t border-white/20 pt-6 flex flex-col gap-4">
+          <div className=" flex flex-col gap-4">
             <button
               className="px-5 py-3 bg-white text-cyan-700 font-semibold rounded-lg hover:bg-cyan-50 transition w-full"
               onClick={() => {
