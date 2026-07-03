@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Message from "../models/messageModal.js";
 import User from "../models/userModal.js";
 
@@ -15,6 +16,100 @@ export const getAllUsers = async (req, res, next) => {
     );
     res.status(200).json({ data: filteredUsers });
   } catch (error) {
+    next(error);
+  }
+};
+
+export const getRecentChats = async (req, res, next) => {
+  try {
+    const currentUser = req.user;
+
+    if (!currentUser) {
+      const error = new Error("Unauthorized");
+      error.statusCode = 401;
+      return next(error);
+    }
+
+    const rawId = currentUser._id || currentUser.id;
+
+    if (!rawId) {
+      const error = new Error("User ID missing");
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    if (!mongoose.isValidObjectId(rawId)) {
+      const error = new Error("Invalid user ID");
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    const userId = new mongoose.Types.ObjectId(rawId);
+
+    const recentChats = await Message.aggregate([
+      {
+        $match: {
+          $or: [{ senderId: userId }, { receiverId: userId }],
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+      {
+        $group: {
+          _id: {
+            $cond: [
+              { $eq: ["$senderId", userId] },
+              "$receiverId",
+              "$senderId",
+            ],
+          },
+          lastMessage: { $first: "$$ROOT" },
+        },
+      },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $project: {
+          _id: "$_id",
+          fullName: "$user.fullName",
+          email: "$user.email",
+          timestamp: "$lastMessage.createdAt",
+          lastMessage: {
+            message: "$lastMessage.message",
+            senderId: "$lastMessage.senderId",
+            receiverId: "$lastMessage.receiverId",
+            createdAt: "$lastMessage.createdAt",
+          },
+        },
+      },
+
+      {
+        $sort: { "lastMessage.createdAt": -1 },
+      },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      count: recentChats.length,
+      data: recentChats,
+    });
+  } catch (error) {
+    console.error(error);
     next(error);
   }
 };
@@ -113,7 +208,10 @@ export const updateUser = async (req, res, next) => {
       { fullName, about },
       { new: true, runValidators: true },
     ).select("-password -__v");
-    res.status(200).json({ data: updatedUser, message: "User details updated successfully" });
+    res.status(200).json({
+      data: updatedUser,
+      message: "User details updated successfully",
+    });
   } catch (error) {
     next(error);
   }

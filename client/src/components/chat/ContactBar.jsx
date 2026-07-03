@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import ThemeModal from "./modals/ThemeModal";
 import api from "../../config/Api";
 import { MdKey } from "react-icons/md";
+import { RiChatNewFill } from "react-icons/ri";
 import AccountModal from "./modals/AccountModal";
 
 const titles = {
@@ -18,7 +19,46 @@ const titles = {
   settings: "Settings",
 };
 
-const ContactBar = ({ fetchMode, receiver, setReceiver, onlineUsers }) => {
+// dates
+const getRelativeTimeLabel = (dateValue) => {
+  if (!dateValue) return "";
+
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const now = new Date();
+
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const startOfYesterday = new Date(startOfToday);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+
+  if (date >= startOfToday) {
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  if (date >= startOfYesterday && date < startOfToday) {
+    return "Yesterday";
+  }
+
+  return date.toLocaleDateString([], {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const ContactBar = ({
+  fetchMode,
+  receiver,
+  setReceiver,
+  onlineUsers,
+  refreshTrigger,
+}) => {
   const { user, setUser, setIsLogin } = useAuth();
 
   const navigate = useNavigate();
@@ -26,8 +66,13 @@ const ContactBar = ({ fetchMode, receiver, setReceiver, onlineUsers }) => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [themeModalOpen, setThemeModalOpen] = useState(false);
-   const [accountModalOpen, setAccountModalOpen] = useState(false);
   const [latestMessages, setLatestMessages] = useState({});
+
+  // For all chats, fallback to account creation date (joined Converse).
+  const getContactTimestamp = (contact) => {
+    const sourceDate = contact.timestamp || contact.createdAt;
+    return getRelativeTimeLabel(sourceDate);
+  };
 
   const fetchLatestMessages = async (contactList) => {
     if (!contactList?.length) {
@@ -49,6 +94,8 @@ const ContactBar = ({ fetchMode, receiver, setReceiver, onlineUsers }) => {
           const senderPrefix =
             String(lastMessage.senderId) === String(user?._id) ? "You: " : "";
 
+          // console.log(contact._id, `${senderPrefix}${lastMessage.message}`);
+
           return [contact._id, `${senderPrefix}${lastMessage.message}`];
         } catch (error) {
           return [contact._id, `${contact.fullName} joined Converse!`];
@@ -64,15 +111,17 @@ const ContactBar = ({ fetchMode, receiver, setReceiver, onlineUsers }) => {
     try {
       let res;
       if (fetchMode === "recentChat") {
-        console.log("Calling recents");
-        // setContacts(DummyRecentContact);
-        setLatestMessages({});
+        // console.log("Calling recents");
+        res = await api.get("/user/recentChat");
+        const recentChats = res?.data?.data || [];
+        setContacts(recentChats);
+        await fetchLatestMessages(recentChats);
       } else if (fetchMode === "allChat") {
-        console.log("Calling All");
+        // console.log("Calling All");
         res = await api.get("/user/allUsers");
         const allContacts = res?.data?.data || [];
         setContacts(allContacts);
-        await fetchLatestMessages(allContacts);
+        setLatestMessages({});
       }
     } catch (error) {
       toast.error("Failed to load contacts. Please try again.");
@@ -83,7 +132,7 @@ const ContactBar = ({ fetchMode, receiver, setReceiver, onlineUsers }) => {
 
   useEffect(() => {
     fetchContacts();
-  }, [fetchMode]);
+  }, [fetchMode, refreshTrigger]);
 
   const handleLogout = () => {
     try {
@@ -156,10 +205,7 @@ const ContactBar = ({ fetchMode, receiver, setReceiver, onlineUsers }) => {
                   </button>
                 </div>
 
-                <div
-                  className="p-3 rounded-xl cursor-pointer hover:bg-base-300 transition mt-2"
-                  onClick={() => setAccountModalOpen(true)}
-                >
+                <div className="p-3 rounded-xl cursor-pointer hover:bg-base-300 transition mt-2">
                   <button className="flex items-center gap-5">
                     <div className="text-xl text-primary">
                       <MdKey />
@@ -194,6 +240,16 @@ const ContactBar = ({ fetchMode, receiver, setReceiver, onlineUsers }) => {
                   Loading Contacts...
                 </span>
               </div>
+            ) : fetchMode === "recentChat" && contacts.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center">
+                <button
+                  // onClick={() => setFetchMode("allChat")}
+                  className="p-3 bg-primary text-white rounded-full mb-2"
+                >
+                  <RiChatNewFill className="text-2xl" />
+                </button>
+                <p className="text-gray-400 text-sm ">No recent chats found</p>
+              </div>
             ) : (
               contacts.map((contact) => (
                 <div
@@ -223,7 +279,9 @@ const ContactBar = ({ fetchMode, receiver, setReceiver, onlineUsers }) => {
                       <h3 className="font-semibold text-base-content">
                         {contact.fullName}
                       </h3>
-                      <p className="text-xs text-gray-500">today</p>
+                      <p className="text-xs text-gray-500">
+                        {getContactTimestamp(contact)}
+                      </p>
                     </div>
                     <p className="text-sm text-base-content/70 truncate">
                       {latestMessages[contact._id] ||
@@ -239,9 +297,6 @@ const ContactBar = ({ fetchMode, receiver, setReceiver, onlineUsers }) => {
 
       {themeModalOpen && (
         <ThemeModal onClose={() => setThemeModalOpen(false)} />
-      )}
-      {accountModalOpen && (
-        <AccountModal onClose={() => setAccountModalOpen(false)} />
       )}
     </>
   );

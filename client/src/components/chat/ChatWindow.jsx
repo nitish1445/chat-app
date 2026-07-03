@@ -11,7 +11,12 @@ import api from "../../config/Api";
 import { useAuth } from "../../context/AuthContext";
 import socketApi from "../../config/WebSocket";
 
-const ChatWindow = ({ receiver, setReceiver, onlineUsers }) => {
+const ChatWindow = ({
+  receiver,
+  setReceiver,
+  onlineUsers,
+  onMessageActivity,
+}) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const bottomRef = useRef(null);
@@ -39,6 +44,7 @@ const ChatWindow = ({ receiver, setReceiver, onlineUsers }) => {
     try {
       if (socketApi.connected) {
         socketApi.emit("send", messagePacket);
+        onMessageActivity?.();
         setInputMessage("");
         setMessages((prev) => [
           ...prev,
@@ -64,6 +70,7 @@ const ChatWindow = ({ receiver, setReceiver, onlineUsers }) => {
 
   const handleReceiveMessage = (newMessagePack) => {
     setMessages((prev) => [...prev, newMessagePack]);
+    onMessageActivity?.();
   };
 
   useEffect(() => {
@@ -122,13 +129,16 @@ const ChatWindow = ({ receiver, setReceiver, onlineUsers }) => {
             <h2 className="text-lg font-semibold text-base-content capitalize leading-tight">
               {receiver.fullName}
             </h2>
-            {onlineUsers?.[receiverId] ? (
-              <p className="text-xs text-green-500 font-medium">Active Now</p>
-            ) : (
-              <p className="text-xs text-gray-500 font-medium">
-                Last seen recently
-              </p>
-            )}
+            {/* active status */}
+            <h6 className="flex justify-start items-center">
+              {onlineUsers?.[receiverId] ? (
+                <p className="text-xs text-green-500 font-medium">Active Now</p>
+              ) : (
+                <p className="text-xs text-gray-500 font-medium">
+                  Last seen recently
+                </p>
+              )}
+            </h6>
           </button>
         </div>
 

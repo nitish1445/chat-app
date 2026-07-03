@@ -4,6 +4,7 @@ import {
   fetchMessages,
   sendMessage,
   updateUser,
+  getRecentChats,
 } from "../controllers/userController.js";
 import { Protect } from "../middlewares/authMiddleware.js";
 
@@ -11,6 +12,7 @@ const router = express.Router();
 
 // fetch all users except current user
 router.get("/allUsers", Protect, getAllUsers);
+router.get("/recentChat", Protect, getRecentChats);
 
 // fetch all old Messages between 2 users
 router.get("/fetchMessages/:receiverId", Protect, fetchMessages);

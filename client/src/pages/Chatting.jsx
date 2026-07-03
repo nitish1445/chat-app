@@ -7,9 +7,10 @@ import { useAuth } from "../context/AuthContext";
 import socketApi from "../config/WebSocket";
 
 const Chatting = () => {
-  const [fetchMode, setFetchMode] = useState("allChat");
+  const [fetchMode, setFetchMode] = useState("recentChat");
   const [receiver, setReceiver] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState({});
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { user, isLogin } = useAuth();
 
   useEffect(() => {
@@ -35,6 +36,10 @@ const Chatting = () => {
       socketApi.off("OnlineUsers", handleOnlineUsers);
     };
   }, []);
+
+  const handleMessageActivity = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
 
   if (!(isLogin || user)) {
     return (
@@ -89,6 +94,7 @@ const Chatting = () => {
           receiver={receiver}
           setReceiver={setReceiver}
           onlineUsers={onlineUsers}
+          refreshTrigger={refreshTrigger}
         />
       </div>
 
@@ -104,6 +110,7 @@ const Chatting = () => {
           receiver={receiver}
           setReceiver={setReceiver}
           onlineUsers={onlineUsers}
+          refreshTrigger={refreshTrigger}
         />
       </div>
 
@@ -118,6 +125,7 @@ const Chatting = () => {
           receiver={receiver}
           setReceiver={setReceiver}
           onlineUsers={onlineUsers}
+          onMessageActivity={handleMessageActivity}
         />
       </div>
     </div>
