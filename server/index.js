@@ -14,7 +14,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://chat-app-p4t2.onrender.com"],
+    origin: [
+      "http://localhost:5173",
+      "https://converse-chatapp-project.vercel.app",
+    ],
     credentials: true,
   }),
 );
@@ -48,7 +51,7 @@ const httpServer = http.createServer(app);
 //httpserver wrapped to socket.io server
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://converse-chatapp-project.vercel.app"],
     methods: ["GET", "POST"],
     credentials: true,
   },
