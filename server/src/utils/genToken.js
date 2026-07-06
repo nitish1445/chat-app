@@ -13,8 +13,8 @@ export const genToken = (user, res) => {
     res.cookie("token", token, {
       maxAge: 1000 * 60 * 60 * 24,
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
   } catch (error) {
     throw error;
